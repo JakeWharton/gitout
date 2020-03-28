@@ -69,10 +69,14 @@ fn clone_or_fetch_bare(dir: &PathBuf, path: &str, url: &str, mut fo: Option<Fetc
   repo_dir.push(path);
 
   if fs::metadata(&repo_dir).map_or_else(|_| false, |m| m.is_dir()) {
+    println!("Fetching {0}", &path);
+
     let repository = Repository::open_bare(&repo_dir).unwrap();
     let mut origin = repository.find_remote("origin").unwrap();
     origin.fetch(&[] as &[String], fo.as_mut(), None).unwrap();
   } else {
+    println!("Cloning {0} from {1}", &path, &url);
+
     fs::create_dir_all(&repo_dir).unwrap();
 
     let mut repo_builder = RepoBuilder::new();
