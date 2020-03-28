@@ -36,7 +36,9 @@ fn main() {
     let mut clone_dir = github_dir.clone();
     clone_dir.push("clone");
 
-    for repo in github.clone.repos {
+    let mut clone_repos = github.clone.repos.clone();
+    clone_repos.append(github.archive.repos.clone().as_mut());
+    for repo in clone_repos {
       let url = format!("https://github.com/{0}.git", &repo);
 
       let mut callbacks = RemoteCallbacks::new();
