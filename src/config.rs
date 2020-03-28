@@ -11,7 +11,8 @@ pub struct Config {
 
 #[derive(Debug, Deserialize, PartialEq)]
 pub struct GitHub {
-  pub api_key: String,
+  pub username: String,
+  pub password: String,
   #[serde(default)]
   pub archive: GitHubArchive,
   #[serde(default)]
@@ -79,7 +80,8 @@ mod test {
       version = 0
 
       [github]
-      api_key = "key"
+      username = "user"
+      password = "pass"
 
       [github.archive]
       owned = false
@@ -103,7 +105,8 @@ mod test {
     let expected = Config {
       version: 0,
       github: Some(GitHub {
-        api_key: "key".to_string(),
+        username: "user".to_string(),
+        password: "pass".to_string(),
         archive: GitHubArchive { owned: false, repos: vec!["example/one".to_string()] },
         clone: GitHubClone { starred: true, watched: true, repos: vec!["example/two".to_string()] },
       }),
