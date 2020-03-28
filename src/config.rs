@@ -1,18 +1,17 @@
 use serde::Deserialize;
 use toml::de::Error;
+use toml::value::Table;
 
 #[derive(Debug, Deserialize, PartialEq)]
 pub struct Config {
   pub version: u32,
-  pub api_key: String,
-  #[serde(default)]
-  pub github: GitHub,
-  #[serde(default)]
-  pub git: Git,
+  pub github: Option<GitHub>,
+  pub git: Option<Git>,
 }
 
-#[derive(Debug, Default, Deserialize, PartialEq)]
+#[derive(Debug, Deserialize, PartialEq)]
 pub struct GitHub {
+  pub api_key: String,
   #[serde(default)]
   pub archive: GitHubArchive,
   #[serde(default)]
@@ -31,7 +30,7 @@ impl Default for GitHubArchive {
   fn default() -> Self {
     GitHubArchive {
       owned: true,
-      repos: vec![]
+      repos: vec![],
     }
   }
 }
@@ -46,16 +45,10 @@ pub struct GitHubClone {
   pub repos: Vec<String>,
 }
 
-#[derive(Debug, Default, Deserialize, PartialEq)]
+#[derive(Debug, Deserialize, PartialEq)]
 pub struct Git {
   #[serde(default)]
-  pub clone: GitCLone,
-}
-
-#[derive(Debug, Default, Deserialize, PartialEq)]
-pub struct GitCLone {
-  #[serde(default)]
-  pub repos: Vec<String>,
+  pub repos: Table,
 }
 
 pub fn parse_config(s: &str) -> Result<Config, Error> {
@@ -65,23 +58,17 @@ pub fn parse_config(s: &str) -> Result<Config, Error> {
 #[cfg(test)]
 mod test {
   use super::*;
+  use toml::value::Value;
 
   #[test]
   fn empty() {
     let actual = parse_config(r#"
       version = 0
-      api_key = "key"
     "#).unwrap();
     let expected = Config {
       version: 0,
-      api_key: "key".to_string(),
-      github: GitHub {
-        archive: GitHubArchive { owned: true, repos: vec![] },
-        clone: GitHubClone { starred: false, watched: false, repos: vec![] },
-      },
-      git: Git {
-        clone: GitCLone { repos: vec![] },
-      },
+      github: None,
+      git: None,
     };
     assert_eq!(actual, expected)
   }
@@ -90,6 +77,8 @@ mod test {
   fn full() {
     let actual = parse_config(r#"
       version = 0
+
+      [github]
       api_key = "key"
 
       [github.archive]
@@ -105,22 +94,20 @@ mod test {
         "example/two",
       ]
 
-      [git.clone]
-      repos = [
-        "https://example.com/example.git",
-      ]
+      [git.repos]
+      example = "https://example.com/example.git"
 
     "#).unwrap();
+    let mut repos = Table::new();
+    repos.insert("example".to_string(), Value::from("https://example.com/example.git"));
     let expected = Config {
       version: 0,
-      api_key: "key".to_string(),
-      github: GitHub {
+      github: Some(GitHub {
+        api_key: "key".to_string(),
         archive: GitHubArchive { owned: false, repos: vec!["example/one".to_string()] },
         clone: GitHubClone { starred: true, watched: true, repos: vec!["example/two".to_string()] },
-      },
-      git: Git {
-        clone: GitCLone { repos: vec!["https://example.com/example.git".to_string()] },
-      },
+      }),
+      git: Some(Git { repos }),
     };
     assert_eq!(actual, expected)
   }
