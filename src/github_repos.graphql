@@ -1,0 +1,12 @@
+query UserRepos($login: String!, $after: String) {
+  user(login: $login) {
+    repositories(first: 100, ownerAffiliations: OWNER, after: $after) {
+      edges {
+        cursor
+        node {
+          nameWithOwner
+        }
+      }
+    }
+  }
+}

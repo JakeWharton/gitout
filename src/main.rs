@@ -1,11 +1,13 @@
+use std::collections::HashSet;
 use std::fs;
 use std::path::PathBuf;
 
+use git2::{Cred, FetchOptions, RemoteCallbacks, Repository};
 use git2::build::RepoBuilder;
-use git2::{Repository, RemoteCallbacks, Cred, FetchOptions};
 
 mod args;
 mod config;
+mod github;
 
 fn main() {
   let args = args::parse_args();
@@ -30,15 +32,28 @@ fn main() {
   }
 
   if let Some(github) = config.github {
+    let user_repos = github::user_repos(&github.username, &github.password);
+
     let mut github_dir = destination.clone();
     github_dir.push("github");
+
+    let mut archive_dir = github_dir.clone();
+    archive_dir.push("archive");
+
+    let mut archive_repos = github.archive.repos.clone();
+    archive_repos.extend(user_repos.clone());
+    let archive_repos: HashSet<String> = archive_repos.into_iter().collect();
+    for repo in &archive_repos {
+      // TODO archive
+    }
 
     let mut clone_dir = github_dir.clone();
     clone_dir.push("clone");
 
     let mut clone_repos = github.clone.repos.clone();
-    clone_repos.append(github.archive.repos.clone().as_mut());
-    for repo in clone_repos {
+    clone_repos.extend(archive_repos.clone());
+    let clone_repos: HashSet<String> = clone_repos.into_iter().collect();
+    for repo in &clone_repos {
       let url = format!("https://github.com/{0}.git", &repo);
 
       let mut callbacks = RemoteCallbacks::new();
@@ -59,6 +74,7 @@ fn main() {
     let mut git_dir = destination.clone();
     git_dir.push("git");
 
+    // TODO to set
     for (path, url) in git.repos {
       let url = url.as_str().unwrap();
       clone_or_fetch_bare(&git_dir, &path, url, None)
