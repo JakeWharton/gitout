@@ -11,8 +11,8 @@ pub struct Config {
 
 #[derive(Debug, Deserialize, PartialEq)]
 pub struct GitHub {
-  pub username: String,
-  pub password: String,
+  pub user: String,
+  pub token: String,
   #[serde(default)]
   pub archive: GitHubArchive,
   #[serde(default)]
@@ -80,8 +80,8 @@ mod test {
       version = 0
 
       [github]
-      username = "user"
-      password = "pass"
+      user = "user"
+      token = "token"
 
       [github.archive]
       owned = false
@@ -98,15 +98,14 @@ mod test {
 
       [git.repos]
       example = "https://example.com/example.git"
-
     "#).unwrap();
     let mut repos = Table::new();
     repos.insert("example".to_string(), Value::from("https://example.com/example.git"));
     let expected = Config {
       version: 0,
       github: Some(GitHub {
-        username: "user".to_string(),
-        password: "pass".to_string(),
+        user: "user".to_string(),
+        token: "token".to_string(),
         archive: GitHubArchive { owned: false, repos: vec!["example/one".to_string()] },
         clone: GitHubClone { starred: true, watched: true, repos: vec!["example/two".to_string()] },
       }),

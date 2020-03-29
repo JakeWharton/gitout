@@ -32,7 +32,7 @@ fn main() {
   }
 
   if let Some(github) = config.github {
-    let user_repos = github::user_repos(&github.username, &github.password);
+    let user_repos = github::user_repos(&github.user, &github.token);
 
     let mut github_dir = destination.clone();
     github_dir.push("github");
@@ -57,8 +57,8 @@ fn main() {
       let url = format!("https://github.com/{0}.git", &repo);
 
       let mut callbacks = RemoteCallbacks::new();
-      let username = &github.username;
-      let password = &github.password;
+      let username = &github.user;
+      let password = &github.token;
       callbacks.credentials(|_url, _username_from_url, _allowed_types| {
         Cred::userpass_plaintext(username, password)
       });
