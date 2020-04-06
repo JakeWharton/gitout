@@ -18,11 +18,14 @@ fn main() {
     config,
     destination,
     verbose,
+    dry_run,
   } = args;
 
-  let destination_metadata = fs::metadata(&destination).unwrap();
-  if !destination_metadata.is_dir() {
-    panic!("Destination must exist and must be a directory")
+  if !dry_run {
+    let destination_metadata = fs::metadata(&destination).unwrap();
+    if !destination_metadata.is_dir() {
+      panic!("Destination must exist and must be a directory")
+    }
   }
 
   let config = fs::read_to_string(config).unwrap();
@@ -74,7 +77,7 @@ fn main() {
       let mut fo = FetchOptions::new();
       fo.remote_callbacks(callbacks);
 
-      clone_or_fetch_bare(&clone_dir, &repo, &url, Some(fo));
+      clone_or_fetch_bare(&clone_dir, &repo, &url, Some(fo), dry_run);
     }
   }
 
@@ -85,31 +88,35 @@ fn main() {
     // TODO to set
     for (path, url) in git.repos {
       let url = url.as_str().unwrap();
-      clone_or_fetch_bare(&git_dir, &path, url, None)
+      clone_or_fetch_bare(&git_dir, &path, url, None, dry_run)
     }
   }
 }
 
-fn clone_or_fetch_bare(dir: &PathBuf, path: &str, url: &str, mut fo: Option<FetchOptions>) {
+fn clone_or_fetch_bare(dir: &PathBuf, path: &str, url: &str, mut fo: Option<FetchOptions>, dry_run: bool) {
   let mut repo_dir = dir.clone();
   repo_dir.push(path);
 
   if fs::metadata(&repo_dir).map_or_else(|_| false, |m| m.is_dir()) {
     println!("Fetching {0}", &path);
 
-    let repository = Repository::open_bare(&repo_dir).unwrap();
-    let mut origin = repository.find_remote("origin").unwrap();
-    origin.fetch(&[] as &[String], fo.as_mut(), None).unwrap();
+    if !dry_run {
+      let repository = Repository::open_bare(&repo_dir).unwrap();
+      let mut origin = repository.find_remote("origin").unwrap();
+      origin.fetch(&[] as &[String], fo.as_mut(), None).unwrap();
+    }
   } else {
     println!("Cloning {0} from {1}", &path, &url);
 
-    fs::create_dir_all(&repo_dir).unwrap();
+    if !dry_run {
+      fs::create_dir_all(&repo_dir).unwrap();
 
-    let mut repo_builder = RepoBuilder::new();
-    if let Some(fo) = fo {
-      repo_builder.fetch_options(fo);
+      let mut repo_builder = RepoBuilder::new();
+      if let Some(fo) = fo {
+        repo_builder.fetch_options(fo);
+      }
+      repo_builder.bare(true);
+      repo_builder.clone(url, &repo_dir).unwrap();
     }
-    repo_builder.bare(true);
-    repo_builder.clone(url, &repo_dir).unwrap();
   }
 }

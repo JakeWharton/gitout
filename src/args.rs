@@ -15,6 +15,10 @@ pub struct Args {
   /// Enable verbose logging
   #[structopt(short, long)]
   pub verbose: bool,
+
+  /// Print actions instead of performing them
+  #[structopt(long)]
+  pub dry_run: bool,
 }
 
 pub fn parse_args() -> Args {
