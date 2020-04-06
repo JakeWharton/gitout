@@ -41,7 +41,9 @@ fn main() {
     archive_dir.push("archive");
 
     let mut archive_repos = github.archive.repos.clone();
-    archive_repos.extend(user_repos.clone());
+    if github.archive.owned {
+      archive_repos.extend(user_repos.owned.clone());
+    }
     let archive_repos: HashSet<String> = archive_repos.into_iter().collect();
     for repo in &archive_repos {
       // TODO archive
@@ -52,6 +54,12 @@ fn main() {
 
     let mut clone_repos = github.clone.repos.clone();
     clone_repos.extend(archive_repos.clone());
+    if github.clone.starred {
+      clone_repos.extend(user_repos.starred.clone());
+    }
+    if github.clone.watched {
+      clone_repos.extend(user_repos.watched.clone());
+    }
     let clone_repos: HashSet<String> = clone_repos.into_iter().collect();
     for repo in &clone_repos {
       let url = format!("https://github.com/{0}.git", &repo);
