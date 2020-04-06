@@ -36,6 +36,9 @@ fn main() {
 
   if let Some(github) = config.github {
     let user_repos = github::user_repos(&github.user, &github.token);
+    if verbose {
+      dbg!(&user_repos);
+    }
 
     let mut github_dir = destination.clone();
     github_dir.push("github");

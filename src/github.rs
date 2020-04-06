@@ -77,6 +77,7 @@ pub fn user_repos(user: &str, token: &str) -> Repositories {
   };
 }
 
+#[derive(Debug, PartialEq)]
 pub struct Repositories {
   pub owned: Vec<String>,
   pub starred: Vec<String>,
