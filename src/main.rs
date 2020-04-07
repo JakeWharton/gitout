@@ -55,16 +55,16 @@ fn main() {
       // TODO archive
     }
 
-    let mut clone_dir = github_dir.clone();
+    let mut clone_dir = github_dir;
     clone_dir.push("clone");
 
     let mut clone_repos = github.clone.repos.clone();
-    clone_repos.extend(archive_repos.clone());
+    clone_repos.extend(archive_repos);
     if github.clone.starred {
-      clone_repos.extend(user_repos.starred.clone());
+      clone_repos.extend(user_repos.starred);
     }
     if github.clone.watched {
-      clone_repos.extend(user_repos.watched.clone());
+      clone_repos.extend(user_repos.watched);
     }
     let clone_repos: HashSet<String> = clone_repos.into_iter().collect();
     for repo in &clone_repos {
@@ -85,7 +85,7 @@ fn main() {
   }
 
   if let Some(git) = config.git {
-    let mut git_dir = destination.clone();
+    let mut git_dir = destination;
     git_dir.push("git");
 
     // TODO to set

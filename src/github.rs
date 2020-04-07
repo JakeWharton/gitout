@@ -47,7 +47,7 @@ pub fn user_repos(user: &str, token: &str) -> Repositories {
     let owned_response = user.repositories.edges.unwrap();
     let starred_response = user.starred_repositories.edges.unwrap();
     let watched_response = user.watching.edges.unwrap();
-    if owned_response.len() == 0 && starred_response.len() == 0 && watched_response.len() == 0 {
+    if owned_response.is_empty() && starred_response.is_empty() && watched_response.is_empty() {
       break;
     }
     for repository in owned_response {
@@ -70,11 +70,11 @@ pub fn user_repos(user: &str, token: &str) -> Repositories {
     }
   }
 
-  return Repositories {
+  Repositories {
     owned: owned_repos,
     starred: starred_repos,
     watched: watched_repos,
-  };
+  }
 }
 
 #[derive(Debug, PartialEq)]
