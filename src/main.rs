@@ -4,6 +4,7 @@ use std::path::PathBuf;
 
 use git2::{Cred, FetchOptions, RemoteCallbacks, Repository};
 use git2::build::RepoBuilder;
+use reqwest::blocking::Client;
 
 mod args;
 mod config;
@@ -35,7 +36,18 @@ fn main() {
   }
 
   if let Some(github) = config.github {
-    let user_repos = github::user_repos(&github.user, &github.token);
+    static APP_USER_AGENT: &str = concat!(
+      env!("CARGO_PKG_NAME"),
+      "/",
+      env!("CARGO_PKG_VERSION"),
+    );
+
+    let client = Client::builder()
+      .user_agent(APP_USER_AGENT)
+      .build()
+      .unwrap();
+
+    let user_repos = github::user_repos(&client, &github.user, &github.token);
     if verbose {
       dbg!(&user_repos);
     }
@@ -88,7 +100,6 @@ fn main() {
     let mut git_dir = destination;
     git_dir.push("git");
 
-    // TODO to set
     for (path, url) in git.repos {
       let url = url.as_str().unwrap();
       clone_or_fetch_bare(&git_dir, &path, url, None, dry_run)

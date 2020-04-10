@@ -9,18 +9,7 @@ use reqwest::blocking::Client;
 )]
 struct UserRepos;
 
-pub fn user_repos(user: &str, token: &str) -> Repositories {
-  static APP_USER_AGENT: &str = concat!(
-    env!("CARGO_PKG_NAME"),
-    "/",
-    env!("CARGO_PKG_VERSION"),
-  );
-
-  let client = Client::builder()
-    .user_agent(APP_USER_AGENT)
-    .build()
-    .unwrap();
-
+pub fn user_repos(client: &Client, user: &str, token: &str) -> Repositories {
   let mut owned_after: Option<String> = None;
   let mut owned_repos: Vec<String> = vec![];
   let mut starred_after: Option<String> = None;
