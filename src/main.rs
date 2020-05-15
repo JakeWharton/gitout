@@ -55,23 +55,24 @@ fn main() {
     let mut github_dir = destination.clone();
     github_dir.push("github");
 
-    let mut archive_dir = github_dir.clone();
-    archive_dir.push("archive");
-
-    let mut archive_repos = github.archive.repos.clone();
-    if github.archive.owned {
-      archive_repos.extend(user_repos.owned.clone());
-    }
-    let archive_repos: HashSet<String> = archive_repos.into_iter().collect();
-    for repo in &archive_repos {
-      // TODO archive
-    }
+    // let mut archive_dir = github_dir.clone();
+    // archive_dir.push("archive");
+    //
+    // let mut archive_repos = github.archive.repos.clone();
+    // if github.archive.owned {
+    //   archive_repos.extend(user_repos.owned.clone());
+    // }
+    // let archive_repos: HashSet<String> = archive_repos.into_iter().collect();
+    // for repo in &archive_repos {
+    //   // TODO archive
+    // }
 
     let mut clone_dir = github_dir;
     clone_dir.push("clone");
 
     let mut clone_repos = github.clone.repos.clone();
-    clone_repos.extend(archive_repos);
+    // clone_repos.extend(archive_repos);
+    clone_repos.extend(user_repos.owned.clone());
     if github.clone.starred {
       clone_repos.extend(user_repos.starred);
     }

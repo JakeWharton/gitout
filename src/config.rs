@@ -13,28 +13,28 @@ pub struct Config {
 pub struct GitHub {
   pub user: String,
   pub token: String,
-  #[serde(default)]
-  pub archive: GitHubArchive,
+  // #[serde(default)]
+  // pub archive: GitHubArchive,
   #[serde(default)]
   pub clone: GitHubClone,
 }
 
-#[derive(Debug, Deserialize, PartialEq)]
-pub struct GitHubArchive {
-  #[serde(default)]
-  pub owned: bool,
-  #[serde(default)]
-  pub repos: Vec<String>,
-}
-
-impl Default for GitHubArchive {
-  fn default() -> Self {
-    GitHubArchive {
-      owned: true,
-      repos: vec![],
-    }
-  }
-}
+// #[derive(Debug, Deserialize, PartialEq)]
+// pub struct GitHubArchive {
+//   #[serde(default)]
+//   pub owned: bool,
+//   #[serde(default)]
+//   pub repos: Vec<String>,
+// }
+//
+// impl Default for GitHubArchive {
+//   fn default() -> Self {
+//     GitHubArchive {
+//       owned: true,
+//       repos: vec![],
+//     }
+//   }
+// }
 
 #[derive(Debug, Default, Deserialize, PartialEq)]
 pub struct GitHubClone {
@@ -83,12 +83,6 @@ mod test {
       user = "user"
       token = "token"
 
-      [github.archive]
-      owned = false
-      repos = [
-        "example/one",
-      ]
-
       [github.clone]
       starred = true
       watched = true
@@ -106,7 +100,7 @@ mod test {
       github: Some(GitHub {
         user: "user".to_string(),
         token: "token".to_string(),
-        archive: GitHubArchive { owned: false, repos: vec!["example/one".to_string()] },
+        // archive: GitHubArchive { owned: false, repos: vec!["example/one".to_string()] },
         clone: GitHubClone { starred: true, watched: true, repos: vec!["example/two".to_string()] },
       }),
       git: Some(Git { repos }),

@@ -72,3 +72,26 @@ pub struct Repositories {
   pub starred: Vec<String>,
   pub watched: Vec<String>,
 }
+
+// pub fn archive_repo(client: &Client, token: &str) {
+//   let migration_request = MigrationRequest {
+//     repositories: vec![],
+//   };
+//   client.post("https://api.github.com/user/migrations")
+//     .bearer_auth(token)
+//     .header(ACCEPT, "application/vnd.github.wyandotte-preview+json")
+//     .json(&migration_request)
+//     .send()
+//     .unwrap();
+//
+//   loop {
+//     // TODO read status
+//   }
+//
+//   // TODO download migration
+// }
+//
+// #[derive(Serialize)]
+// struct MigrationRequest {
+//   repositories: Vec<String>,
+// }
