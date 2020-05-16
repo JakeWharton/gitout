@@ -2,8 +2,8 @@ use std::collections::HashSet;
 use std::fs;
 use std::path::PathBuf;
 
-use git2::{Cred, FetchOptions, RemoteCallbacks, Repository};
 use git2::build::RepoBuilder;
+use git2::{Cred, FetchOptions, RemoteCallbacks, Repository};
 use reqwest::blocking::Client;
 
 mod args;
@@ -36,11 +36,7 @@ fn main() {
   }
 
   if let Some(github) = config.github {
-    static APP_USER_AGENT: &str = concat!(
-      env!("CARGO_PKG_NAME"),
-      "/",
-      env!("CARGO_PKG_VERSION"),
-    );
+    static APP_USER_AGENT: &str = concat!(env!("CARGO_PKG_NAME"), "/", env!("CARGO_PKG_VERSION"));
 
     let client = Client::builder()
       .user_agent(APP_USER_AGENT)
@@ -108,7 +104,13 @@ fn main() {
   }
 }
 
-fn clone_or_fetch_bare(dir: &PathBuf, path: &str, url: &str, mut fo: Option<FetchOptions>, dry_run: bool) {
+fn clone_or_fetch_bare(
+  dir: &PathBuf,
+  path: &str,
+  url: &str,
+  mut fo: Option<FetchOptions>,
+  dry_run: bool,
+) {
   let mut repo_dir = dir.clone();
   repo_dir.push(path);
 

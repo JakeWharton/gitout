@@ -63,9 +63,12 @@ mod test {
 
   #[test]
   fn empty() {
-    let actual = parse_config(r#"
+    let actual = parse_config(
+      r#"
       version = 0
-    "#).unwrap();
+      "#,
+    )
+    .unwrap();
     let expected = Config {
       version: 0,
       github: None,
@@ -76,7 +79,8 @@ mod test {
 
   #[test]
   fn full() {
-    let actual = parse_config(r#"
+    let actual = parse_config(
+      r#"
       version = 0
 
       [github]
@@ -92,16 +96,25 @@ mod test {
 
       [git.repos]
       example = "https://example.com/example.git"
-    "#).unwrap();
+      "#,
+    )
+    .unwrap();
     let mut repos = Table::new();
-    repos.insert("example".to_string(), Value::from("https://example.com/example.git"));
+    repos.insert(
+      "example".to_string(),
+      Value::from("https://example.com/example.git"),
+    );
     let expected = Config {
       version: 0,
       github: Some(GitHub {
         user: "user".to_string(),
         token: "token".to_string(),
         // archive: GitHubArchive { owned: false, repos: vec!["example/one".to_string()] },
-        clone: GitHubClone { starred: true, watched: true, repos: vec!["example/two".to_string()] },
+        clone: GitHubClone {
+          starred: true,
+          watched: true,
+          repos: vec!["example/two".to_string()],
+        },
       }),
       git: Some(Git { repos }),
     };
