@@ -46,3 +46,14 @@ repos = [
 [git.repos]
 asm = "https://gitlab.ow2.org/asm/asm.git"
 ```
+
+Development
+-----------
+
+If you have Rust installed, a debug binary can be build with `cargo build` and a release binary with `cargo build --release`.
+The binary will be in `target/debug/gitout` or `target/release/gitout`, respectively.
+Run all the tests with `cargo test`.
+Format the code with `cargo fmt`.
+Run the Clippy tool with `cargo clippy`.
+
+If you have Docker but not Rust, `docker build .` which will do everything. This is what runs on CI.
