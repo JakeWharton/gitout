@@ -102,6 +102,8 @@ fn main() {
       clone_or_fetch_bare(&git_dir, &path, url, None, dry_run)
     }
   }
+
+  println!("Done!");
 }
 
 fn clone_or_fetch_bare(
