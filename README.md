@@ -89,7 +89,7 @@ Run all the tests with `cargo test`.
 Format the code with `cargo fmt`.
 Run the Clippy tool with `cargo clippy`.
 
-If you have Docker but not Rust, `docker build .` which will do everything. This is what runs on CI.
+If you have Docker but not Rust, run `docker build .` which will do everything. This is what runs on CI.
 
 
 LICENSE
