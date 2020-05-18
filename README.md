@@ -9,8 +9,6 @@ Installation
 
 ### Rust
 
-TODO not yet released though!
-
 If you have Rust installed you can install the binary by running `cargo install gitout`.
 
 [![Latest version](https://img.shields.io/crates/v/gitout.svg)](https://crates.io/crates/gitout)
