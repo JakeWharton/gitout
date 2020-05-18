@@ -23,3 +23,13 @@ jobs:
         repository: jakewharton/gitout
         tag_with_ref: true
         add_git_labels: true
+
+    - uses: actions-rs/toolchain@v1
+      with:
+        toolchain: stable
+
+    - uses: actions-rs/cargo@v1
+      if: "!startsWith(github.event.ref, 'refs/tags')"
+      with:
+        command: publish
+        args: --dry-run
