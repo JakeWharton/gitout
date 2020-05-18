@@ -72,7 +72,7 @@ token = "abcd1234efgh5678ij90"
 starred = true  # Optional, default false
 watched = true  # Optional, default false
 repos = [
-  "android/android-ktx",
+  "JakeWharton/gitout",
 ]
 
 [git.repos]
