@@ -3,6 +3,22 @@ Git Out
 
 A command-line tool to automatically backup Git repositories from GitHub or anywhere.
 
+
+Installation
+------------
+
+### Rust
+
+TODO not yet released though!
+
+If you have Rust installed you can install the binary by running `cargo install gitout`.
+
+[![Latest version](https://img.shields.io/crates/v/gitout.svg)](https://crates.io/crates/gitout)
+
+### Docker
+
+The binary is available inside the `jakewharton/gitout` Docker container which can also run it as a cron job.
+
 [![Docker Image Version](https://img.shields.io/docker/v/jakewharton/gitout?sort=semver)][hub]
 [![Docker Image Size](https://img.shields.io/docker/image-size/jakewharton/gitout)][layers]
 [![Docker Image Layers](https://img.shields.io/microbadger/layers/jakewharton/gitout)][layers]
@@ -10,6 +26,16 @@ A command-line tool to automatically backup Git repositories from GitHub or anyw
 
  [hub]: https://hub.docker.com/r/jakewharton/gitout/
  [layers]: https://microbadger.com/images/jakewharton/gitout
+
+TODO running one-off
+
+TODO running cron'd
+
+TODO using compose
+
+### Binaries
+
+TODO GitHub releases download?
 
 
 Usage
@@ -54,6 +80,7 @@ repos = [
 [git.repos]
 asm = "https://gitlab.ow2.org/asm/asm.git"
 ```
+
 
 Development
 -----------
