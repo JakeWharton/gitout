@@ -25,11 +25,36 @@ The binary is available inside the `jakewharton/gitout` Docker container which c
  [hub]: https://hub.docker.com/r/jakewharton/gitout/
  [layers]: https://microbadger.com/images/jakewharton/gitout
 
-TODO running one-off
+You can run `gitout` continuously in a Docker container. Mount the `/data` and `/config` folders, specify a `CRON` environment variable, and run:
 
-TODO running cron'd
+```
+$ docker run -d \
+    -v /path/to/data:/data \
+    -v /path/to/config.toml:/config/config.toml \
+    -e "CRON=*/1 * * * *" \
+    jakewharton/gitout
+```
 
-TODO using compose
+For help creating a valid cron specifier, visit [cron.help](https://cron.help/#0_*_*_*_*).
+
+To be notified when sync is failing visit https://healthchecks.io, create a check, and specify the ID to the container using the `HEALTHCHECK_ID` environment variable.
+
+If you're using Docker compose, an example setup looks like;
+```yaml
+services:
+  gitout:
+    image: jakewharton/gitout:latest
+    restart: unless-stopped
+    volumes:
+      - /path/to/data:/data
+      - /path/to/config:/config
+    environment:
+      - "CRON=0 * * * *"
+      #Optional:
+      - "HEALTHCHECK_ID=..."
+```
+
+Note: You may want to specify an explicit version rather than latest. See https://hub.docker.com/r/jakewharton/gitout/tags.
 
 ### Binaries
 
