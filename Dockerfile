@@ -26,7 +26,9 @@ FROM oznu/s6-alpine:3.11
 ENV S6_BEHAVIOUR_IF_STAGE2_FAILS=2
 # Show full backtraces for crashes.
 ENV RUST_BACKTRACE=full
-RUN apk update && apk add ca-certificates && rm -rf /var/cache/apk/*
+RUN apk update && \
+    apk add ca-certificates curl && \
+    rm -rf /var/cache/apk/*
 COPY root/ /
 WORKDIR /app
 COPY --from=rust /app/target/x86_64-unknown-linux-musl/release/gitout ./

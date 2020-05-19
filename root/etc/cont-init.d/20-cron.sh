@@ -26,12 +26,18 @@ ERROR: '/config/config.toml' file must exist
 	exit 1
 fi
 
+if [ -z "$HEALTHCHECK_ID" ]; then
+	echo "
+NOTE: Define HEALTHCHECK_ID with https://healthchecks.io to monitor sync job
+"
+fi
+
 # Set up the cron schedule.
 echo "
 Initializing cron
 
 $CRON
 "
-echo "$CRON /app/gitout /config/config.toml /data" >/tmp/crontab.tmp
+echo "$CRON /app/sync.sh" >/tmp/crontab.tmp
 crontab -u abc /tmp/crontab.tmp
 rm /tmp/crontab.tmp
