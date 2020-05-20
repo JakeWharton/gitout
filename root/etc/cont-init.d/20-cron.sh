@@ -39,6 +39,6 @@ Initializing cron
 $CRON
 "
 crontab -u abc -d # Delete any existing crontab.
-echo "$CRON /app/sync.sh" >/tmp/crontab.tmp
+echo "$CRON /usr/bin/flock -n /app/sync.lock /app/sync.sh" >/tmp/crontab.tmp
 crontab -u abc /tmp/crontab.tmp
 rm /tmp/crontab.tmp
