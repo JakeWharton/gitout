@@ -104,6 +104,17 @@ repos = [
 asm = "https://gitlab.ow2.org/asm/asm.git"
 ```
 
+### Creating a GitHub token
+
+  1. Visit https://github.com/settings/tokens
+  2. Click "Generate new token"
+  3. Type "gitout" in the name field
+  4. Select the "repo" and "read:user" scopes
+     - `repo`: Needed to clone private repositories (if you only have public repositories then just `public_repo` will also work)
+     - `read:user`: Needed to traverse your owned, starred, and watched repo lists
+  5. Select "Generate token"
+  6. Copy the value into your `config.toml` as it will not be shown again
+
 
 Development
 -----------

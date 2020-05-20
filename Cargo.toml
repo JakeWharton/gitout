@@ -1,6 +1,6 @@
 [package]
 name = "gitout"
-version = "0.0.1"
+version = "0.1.0"
 authors = ["Jake Wharton <gitout@jakewharton.com>"]
 edition = "2018"
 description = "A command-line tool to automatically backup Git repositories from GitHub or anywhere"
