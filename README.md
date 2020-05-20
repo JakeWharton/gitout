@@ -35,7 +35,9 @@ The binary is available inside the `jakewharton/gitout` Docker container which c
  [hub]: https://hub.docker.com/r/jakewharton/gitout/
  [layers]: https://microbadger.com/images/jakewharton/gitout
 
-Mount the `/data` and `/config` folders, specify a `CRON` environment variable, and run:
+Mount a `/data` volume which is where the repositories will be stored.
+Mount the `/config` folder which contains a `config.toml` or mount a `/config/config.toml` file directly.
+Specify a `CRON` environment variable with a cron specifier dictating the schedule for when the tool should run.
 
 ```
 $ docker run -d \
@@ -49,7 +51,9 @@ For help creating a valid cron specifier, visit [cron.help](https://cron.help/#0
 
 To be notified when sync is failing visit https://healthchecks.io, create a check, and specify the ID to the container using the `HEALTHCHECK_ID` environment variable (for example, `-e "HEALTHCHECK_ID=..."`).
 
-If you're using Docker compose, an example setup looks like;
+To write data as a particular user, the `PUID` and `PGID` environment variables can be set to your user ID and group ID, respectively.
+
+If you're using Docker Compose, an example setup looks like;
 ```yaml
 services:
   gitout:
@@ -62,13 +66,16 @@ services:
       - "CRON=0 * * * *"
       #Optional:
       - "HEALTHCHECK_ID=..."
+      - "PUID=..."
+      - "PGID=..."
 ```
 
-Note: You may want to specify an explicit version rather than latest. See https://hub.docker.com/r/jakewharton/gitout/tags.
+Note: You may want to specify an explicit version rather than `latest`.
+See https://hub.docker.com/r/jakewharton/gitout/tags or `CHANGELOG.md` for the available versions.
 
 ### Binaries
 
-TODO GitHub releases download?
+TODO GitHub releases download binaries https://github.com/JakeWharton/gitout/issues/8
 
 
 Usage
