@@ -15,7 +15,7 @@ If you have Rust installed you can install the binary by running `cargo install 
 
 ### Docker
 
-The binary is available inside the `jakewharton/gitout` Docker container which can also run it as a cron job.
+The binary is available inside the `jakewharton/gitout` Docker container which can run it as a cron job.
 
 [![Docker Image Version](https://img.shields.io/docker/v/jakewharton/gitout?sort=semver)][hub]
 [![Docker Image Size](https://img.shields.io/docker/image-size/jakewharton/gitout)][layers]
@@ -25,7 +25,7 @@ The binary is available inside the `jakewharton/gitout` Docker container which c
  [hub]: https://hub.docker.com/r/jakewharton/gitout/
  [layers]: https://microbadger.com/images/jakewharton/gitout
 
-You can run `gitout` continuously in a Docker container. Mount the `/data` and `/config` folders, specify a `CRON` environment variable, and run:
+Mount the `/data` and `/config` folders, specify a `CRON` environment variable, and run:
 
 ```
 $ docker run -d \
@@ -37,7 +37,7 @@ $ docker run -d \
 
 For help creating a valid cron specifier, visit [cron.help](https://cron.help/#0_*_*_*_*).
 
-To be notified when sync is failing visit https://healthchecks.io, create a check, and specify the ID to the container using the `HEALTHCHECK_ID` environment variable.
+To be notified when sync is failing visit https://healthchecks.io, create a check, and specify the ID to the container using the `HEALTHCHECK_ID` environment variable (for example, `-e "HEALTHCHECK_ID=..."`).
 
 If you're using Docker compose, an example setup looks like;
 ```yaml
