@@ -31,7 +31,7 @@ Mount the `/data` and `/config` folders, specify a `CRON` environment variable, 
 $ docker run -d \
     -v /path/to/data:/data \
     -v /path/to/config.toml:/config/config.toml \
-    -e "CRON=*/1 * * * *" \
+    -e "CRON=0 * * * *" \
     jakewharton/gitout
 ```
 
