@@ -3,6 +3,16 @@ Git Out
 
 A command-line tool to automatically backup Git repositories from GitHub or anywhere.
 
+The `gitout` tool will clone git repos from GitHub or any other git hosting service.
+If the repository was already cloned, it will fetch any updates to keep your local copy in sync.
+
+When you add your GitHub username and a token, `gitout` will discover all of your owned repositories and synchronize them automatically.
+You can opt-in to having repositories that you've starred or watched synchronized as well.
+
+The cloned repositories are [bare](https://www.saintsjd.com/2011/01/what-is-a-bare-git-repository/).
+In other words, there is no working copy of the files for you to interact with.
+If you need access to the files, you can `git clone /path/to/bare/repo`.
+
 
 Installation
 ------------
@@ -96,10 +106,12 @@ token = "abcd1234efgh5678ij90"
 [github.clone]
 starred = true  # Optional, default false
 watched = true  # Optional, default false
+# Extra repos to synchronize that are not owned, starred, or watched by you.
 repos = [
   "JakeWharton/gitout",
 ]
 
+# Repos not on GitHub to synchronize.
 [git.repos]
 asm = "https://gitlab.ow2.org/asm/asm.git"
 ```
