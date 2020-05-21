@@ -103,6 +103,9 @@ ARGS:
 Configuration specification
 ---------------------------
 
+Until version 1.0 of the tool, the TOML version is set to 0 and may change incompatibly change between 0.x releases.
+You can find migration information in the `CHANGELOG.md` file.
+
 ```toml
 version = 0
 
