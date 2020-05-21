@@ -28,8 +28,7 @@ fi
 
 if [ -z "$HEALTHCHECK_ID" ]; then
 	echo "
-NOTE: Define HEALTHCHECK_ID with https://healthchecks.io to monitor sync job
-"
+NOTE: Define HEALTHCHECK_ID with https://healthchecks.io to monitor sync job"
 fi
 
 # Set up the cron schedule.
