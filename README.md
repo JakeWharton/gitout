@@ -29,8 +29,6 @@ The binary is available inside the `jakewharton/gitout` Docker container which c
 
 [![Docker Image Version](https://img.shields.io/docker/v/jakewharton/gitout?sort=semver)][hub]
 [![Docker Image Size](https://img.shields.io/docker/image-size/jakewharton/gitout)][layers]
-[![Docker Image Layers](https://img.shields.io/microbadger/layers/jakewharton/gitout)][layers]
-[![Docker Pulls](https://img.shields.io/docker/pulls/jakewharton/gitout.svg)][hub]
 
  [hub]: https://hub.docker.com/r/jakewharton/gitout/
  [layers]: https://microbadger.com/images/jakewharton/gitout
