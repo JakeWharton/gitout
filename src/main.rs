@@ -1,8 +1,8 @@
 use std::collections::HashSet;
-use std::fs;
+use std::io::Write;
 use std::path::PathBuf;
+use std::{fs, io};
 
-use git2::build::RepoBuilder;
 use git2::{Cred, FetchOptions, RemoteCallbacks, Repository};
 use reqwest::blocking::Client;
 
@@ -43,6 +43,8 @@ fn main() {
 			.build()
 			.unwrap();
 
+		println!("Querying GitHub information for {0}…", &github.user);
+		io::stdout().flush().unwrap();
 		let user_repos = github::user_repos(&client, &github.user, &github.token);
 		if verbose {
 			dbg!(&user_repos);
@@ -76,31 +78,39 @@ fn main() {
 			clone_repos.extend(user_repos.watched);
 		}
 		let clone_repos: HashSet<String> = clone_repos.into_iter().collect();
-		for repo in &clone_repos {
-			let url = format!("https://github.com/{0}.git", &repo);
 
-			let mut callbacks = RemoteCallbacks::new();
+		println!(
+			"Checking {0} GitHub repository clones for updates…",
+			clone_repos.len()
+		);
+		for (i, repo) in clone_repos.iter().enumerate() {
+			print!("\r{0}/{1} ", i + 1, &clone_repos.len());
+			io::stdout().flush().unwrap();
+
+			let url = format!("https://github.com/{0}.git", &repo);
 			let username = &github.user;
 			let password = &github.token;
-			callbacks.credentials(|_url, _username_from_url, _allowed_types| {
-				Cred::userpass_plaintext(username, password)
-			});
-
-			let mut fo = FetchOptions::new();
-			fo.remote_callbacks(callbacks);
-
-			clone_or_fetch_bare(&clone_dir, &repo, &url, Some(fo), dry_run);
+			clone_or_fetch_bare(&clone_dir, &repo, &url, dry_run, Some((username, password)));
 		}
+		println!("\n");
 	}
 
 	if let Some(git) = config.git {
 		let mut git_dir = destination;
 		git_dir.push("git");
 
-		for (path, url) in git.repos {
+		println!(
+			"Checking {0} git repository clones for updates…",
+			git.repos.len()
+		);
+		for (i, (path, url)) in git.repos.iter().enumerate() {
+			print!("\r{0}/{1} ", i + 1, git.repos.len());
+			io::stdout().flush().unwrap();
+
 			let url = url.as_str().unwrap();
-			clone_or_fetch_bare(&git_dir, &path, url, None, dry_run)
+			clone_or_fetch_bare(&git_dir, &path, url, dry_run, None)
 		}
+		println!("\n");
 	}
 
 	println!("Done!");
@@ -110,32 +120,52 @@ fn clone_or_fetch_bare(
 	dir: &PathBuf,
 	path: &str,
 	url: &str,
-	mut fo: Option<FetchOptions>,
 	dry_run: bool,
+	credentials: Option<(&str, &str)>,
 ) {
-	let mut repo_dir = dir.clone();
-	repo_dir.push(path);
+	let mut updated = false;
 
-	if fs::metadata(&repo_dir).map_or_else(|_| false, |m| m.is_dir()) {
-		println!("Fetching {0}", &path);
+	{
+		let mut callbacks = RemoteCallbacks::new();
 
-		if !dry_run {
-			let repository = Repository::open_bare(&repo_dir).unwrap();
-			let mut origin = repository.find_remote("origin").unwrap();
-			origin.fetch(&[] as &[String], fo.as_mut(), None).unwrap();
+		if let Some((username, password)) = credentials {
+			callbacks.credentials(move |_url, _username_from_url, _allowed_types| {
+				Cred::userpass_plaintext(username, password)
+			});
 		}
-	} else {
-		println!("Cloning {0} from {1}", &path, &url);
 
-		if !dry_run {
-			fs::create_dir_all(&repo_dir).unwrap();
-
-			let mut repo_builder = RepoBuilder::new();
-			if let Some(fo) = fo {
-				repo_builder.fetch_options(fo);
+		callbacks.transfer_progress(|_progress| {
+			if !updated {
+				print!("Synchronizing {0} from {1}… ", &path, &url);
+				io::stdout().flush().unwrap();
+				updated = true;
 			}
-			repo_builder.bare(true);
-			repo_builder.clone(url, &repo_dir).unwrap();
+			true
+		});
+
+		let mut fo = FetchOptions::new();
+		fo.remote_callbacks(callbacks);
+
+		if !dry_run {
+			let mut repo_dir = dir.clone();
+			repo_dir.push(path);
+
+			let repo_exists = fs::metadata(&repo_dir).map_or_else(|_| false, |m| m.is_dir());
+			let repository = if repo_exists {
+				Repository::open_bare(&repo_dir).unwrap()
+			} else {
+				fs::create_dir_all(&repo_dir).unwrap();
+				let repository = Repository::init_bare(&repo_dir).unwrap();
+				repository.remote("origin", url).unwrap();
+				repository
+			};
+
+			let mut origin = repository.find_remote("origin").unwrap();
+			origin.fetch(&[] as &[String], Some(&mut fo), None).unwrap();
 		}
+	}
+
+	if updated {
+		println!("Done")
 	}
 }
