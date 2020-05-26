@@ -7,7 +7,8 @@ fi
 # If gitout fails we want to avoid triggering the health check.
 set -e
 
-/app/gitout /config/config.toml /data
+# shellcheck disable=SC2086
+/app/gitout $GITOUT_ARGS /config/config.toml /data
 
 if [ -n "$HEALTHCHECK_ID" ]; then
 	curl -sS -X POST -o /dev/null --fail "https://hc-ping.com/$HEALTHCHECK_ID"
