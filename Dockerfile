@@ -22,10 +22,16 @@ RUN shfmt -d .
 
 
 FROM oznu/s6-alpine:3.11
-# Fail if cont-init scripts exit with non-zero code.
-ENV S6_BEHAVIOUR_IF_STAGE2_FAILS=2
-# Show full backtraces for crashes.
-ENV RUST_BACKTRACE=full
+ENV \
+    # Fail if cont-init scripts exit with non-zero code.
+    S6_BEHAVIOUR_IF_STAGE2_FAILS=2 \
+    # Show full backtraces for crashes.
+    RUST_BACKTRACE=full \
+    CRON="" \
+    HEALTHCHECK_ID="" \
+    PUID="" \
+    PGID="" \
+    GITOUT_ARGS=""
 RUN apk update && \
     apk add ca-certificates curl && \
     rm -rf /var/cache/apk/*
