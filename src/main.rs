@@ -151,16 +151,17 @@ fn clone_or_fetch_bare(
 			repo_dir.push(path);
 
 			let repo_exists = fs::metadata(&repo_dir).map_or_else(|_| false, |m| m.is_dir());
-			let repository = if repo_exists {
-				Repository::open_bare(&repo_dir).unwrap()
+
+			let repository: Repository;
+			let mut origin = if repo_exists {
+				repository = Repository::open_bare(&repo_dir).unwrap();
+				repository.find_remote("origin").unwrap()
 			} else {
 				fs::create_dir_all(&repo_dir).unwrap();
-				let repository = Repository::init_bare(&repo_dir).unwrap();
-				repository.remote("origin", url).unwrap();
-				repository
+				repository = Repository::init_bare(&repo_dir).unwrap();
+				repository.remote("origin", url).unwrap()
 			};
 
-			let mut origin = repository.find_remote("origin").unwrap();
 			origin.fetch(&[] as &[String], Some(&mut fo), None).unwrap();
 		}
 	}
