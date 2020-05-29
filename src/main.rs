@@ -45,7 +45,14 @@ fn main() {
 
 		println!("Querying GitHub information for {0}…", &github.user);
 		io::stdout().flush().unwrap();
-		let user_repos = github::user_repos(&client, &github.user, &github.token);
+		let user_repos = match github::user_repos(&client, &github.user, &github.token) {
+			Ok(repos) => repos,
+			Err(err) => {
+				eprintln!("Failed to get user's repos: {}", err.to_string());
+				std::process::exit(1);
+			}
+		};
+
 		if verbose {
 			dbg!(&user_repos);
 		}
