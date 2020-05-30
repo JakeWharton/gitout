@@ -1,5 +1,10 @@
+use crate::github::UserReposError::{
+	JsonParsingError, MissingResponseData, RequestError, UnsuccessfulResponse,
+};
+use anyhow::Result;
 use graphql_client::{GraphQLQuery, Response};
 use reqwest::blocking::Client;
+use thiserror::Error;
 
 #[derive(GraphQLQuery)]
 #[graphql(
@@ -9,7 +14,11 @@ use reqwest::blocking::Client;
 )]
 struct UserRepos;
 
-pub fn user_repos(client: &Client, user: &str, token: &str) -> Repositories {
+pub fn user_repos(
+	client: &Client,
+	user: &str,
+	token: &str,
+) -> Result<Repositories, UserReposError> {
 	let mut owned_after: Option<String> = None;
 	let mut owned_repos: Vec<String> = vec![];
 	let mut starred_after: Option<String> = None;
@@ -28,10 +37,15 @@ pub fn user_repos(client: &Client, user: &str, token: &str) -> Repositories {
 			.bearer_auth(token)
 			.json(&query)
 			.send()
-			.unwrap();
+			.map_err(RequestError)?;
 
-		let body: Response<user_repos::ResponseData> = response.json().unwrap();
-		let user = body.data.unwrap().user.unwrap();
+		if !response.status().is_success() {
+			return Err(UnsuccessfulResponse(response.status().to_string()));
+		}
+
+		let body: Response<user_repos::ResponseData> = response.json().map_err(JsonParsingError)?;
+		let data = body.data.ok_or_else(|| MissingResponseData)?;
+		let user = data.user.unwrap();
 
 		let owned_response = user.repositories.edges.unwrap();
 		let starred_response = user.starred_repositories.edges.unwrap();
@@ -59,11 +73,11 @@ pub fn user_repos(client: &Client, user: &str, token: &str) -> Repositories {
 		}
 	}
 
-	Repositories {
+	Ok(Repositories {
 		owned: owned_repos,
 		starred: starred_repos,
 		watched: watched_repos,
-	}
+	})
 }
 
 #[derive(Debug, PartialEq)]
@@ -71,6 +85,18 @@ pub struct Repositories {
 	pub owned: Vec<String>,
 	pub starred: Vec<String>,
 	pub watched: Vec<String>,
+}
+
+#[derive(Error, Debug)]
+pub enum UserReposError {
+	#[error("Failed to deserialize JSON")]
+	JsonParsingError(reqwest::Error),
+	#[error("Unsuccessful response: {0}")]
+	UnsuccessfulResponse(String),
+	#[error("No response data")]
+	MissingResponseData,
+	#[error(transparent)]
+	RequestError(#[from] reqwest::Error),
 }
 
 // pub fn archive_repo(client: &Client, token: &str) {
