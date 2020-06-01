@@ -8,7 +8,7 @@ fi
 set -e
 
 # shellcheck disable=SC2086
-/app/gitout $GITOUT_ARGS /config/config.toml /data
+/app/gitout --no-archive $GITOUT_ARGS /config/config.toml /data
 
 if [ -n "$HEALTHCHECK_ID" ]; then
 	curl -sS -X POST -o /dev/null --fail "https://hc-ping.com/$HEALTHCHECK_ID"

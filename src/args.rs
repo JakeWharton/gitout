@@ -16,6 +16,10 @@ pub struct Args {
 	#[structopt(short, long)]
 	pub verbose: bool,
 
+	/// Disable repository archiving
+	#[structopt(long)]
+	pub no_archive: bool,
+
 	/// Print actions instead of performing them
 	#[structopt(long)]
 	pub dry_run: bool,
