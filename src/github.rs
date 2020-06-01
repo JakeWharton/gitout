@@ -1,5 +1,14 @@
+use std::fs::File;
+use std::io::copy;
+use std::path::PathBuf;
+use std::time::Duration;
+use std::{fs, thread};
+
 use graphql_client::{GraphQLQuery, Response};
 use reqwest::blocking::Client;
+use reqwest::header::ACCEPT;
+use serde::Deserialize;
+use serde::Serialize;
 
 #[derive(GraphQLQuery)]
 #[graphql(
@@ -73,25 +82,108 @@ pub struct Repositories {
 	pub watched: Vec<String>,
 }
 
-// pub fn archive_repo(client: &Client, token: &str) {
-//   let migration_request = MigrationRequest {
-//     repositories: vec![],
-//   };
-//   client.post("https://api.github.com/user/migrations")
-//     .bearer_auth(token)
-//     .header(ACCEPT, "application/vnd.github.wyandotte-preview+json")
-//     .json(&migration_request)
-//     .send()
-//     .unwrap();
-//
-//   loop {
-//     // TODO read status
-//   }
-//
-//   // TODO download migration
-// }
-//
-// #[derive(Serialize)]
-// struct MigrationRequest {
-//   repositories: Vec<String>,
-// }
+pub fn archive_repo(client: &Client, dir: &PathBuf, repository: &str, token: &str) {
+	let migration_request = MigrationRequest {
+		repositories: vec![repository.to_owned()],
+	};
+	let create_response: MigrationResponse = client
+		.post("https://api.github.com/user/migrations")
+		.bearer_auth(token)
+		.header(ACCEPT, "application/vnd.github.wyandotte-preview+json")
+		.json(&migration_request)
+		.send()
+		.unwrap()
+		.error_for_status()
+		.unwrap()
+		.json()
+		.unwrap();
+	let migration_id = create_response.id;
+	let mut migration_state = create_response.state;
+
+	let mut wait = Duration::from_secs(2);
+	loop {
+		if migration_state == "exported" {
+			break;
+		}
+		if migration_state == "failed" {
+			panic!("Creating migration for {} failed", &repository);
+		}
+
+		thread::sleep(wait);
+		if wait < Duration::from_secs(64) {
+			wait *= 2
+		}
+
+		let status_url = format!("https://api.github.com/user/migrations/{0}", migration_id);
+		let status_response: MigrationResponse = client
+			.get(&status_url)
+			.bearer_auth(token)
+			.header(ACCEPT, "application/vnd.github.wyandotte-preview+json")
+			.send()
+			.unwrap()
+			.error_for_status()
+			.unwrap()
+			.json()
+			.unwrap();
+		migration_state = status_response.state;
+	}
+
+	// In order to never lose data if we crash we must perform a dance to update archives:
+	// 1. Download the new archive to repo.zip.new.
+	// 2. Delete the old archive repo.zip.
+	// 3. Rename the new archive from repo.zip.new to repo.zip.
+
+	let mut archive_old = dir.clone();
+	archive_old.push(format!("{0}.zip", &repository));
+	let mut archive_new = dir.clone();
+	archive_new.push(format!("{0}.zip.new", &repository));
+
+	let mut archive_dir = archive_old.clone();
+	archive_dir.pop();
+	if !fs::metadata(&archive_dir).map_or_else(|_| false, |m| m.is_dir()) {
+		fs::create_dir_all(&archive_dir).unwrap();
+	}
+
+	let archive_old_exists = fs::metadata(&archive_old).map_or_else(|_| false, |m| m.is_file());
+	let archive_new_exists = fs::metadata(&archive_new).map_or_else(|_| false, |m| m.is_file());
+
+	if archive_new_exists {
+		fs::remove_file(&archive_new).unwrap();
+	}
+
+	// Step 1:
+	let download_url = format!(
+		"https://api.github.com/user/migrations/{0}/archive",
+		migration_id
+	);
+	let mut download_request = client
+		.get(&download_url)
+		.bearer_auth(token)
+		.header(ACCEPT, "application/vnd.github.wyandotte-preview+json")
+		.send()
+		.unwrap()
+		.error_for_status()
+		.unwrap();
+
+	let mut archive_file = File::create(&archive_new).unwrap();
+	copy(&mut download_request, &mut archive_file).unwrap();
+
+	// Step 2:
+	if archive_old_exists {
+		fs::rename(&archive_old, &archive_old).unwrap();
+	}
+
+	// Step 3:
+	fs::rename(&archive_new, &archive_old).unwrap();
+}
+
+#[derive(Serialize)]
+struct MigrationRequest {
+	repositories: Vec<String>,
+}
+
+#[derive(Deserialize)]
+struct MigrationResponse {
+	id: u64,
+	state: String,
+}
