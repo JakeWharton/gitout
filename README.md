@@ -101,7 +101,7 @@ ARGS:
 Configuration specification
 ---------------------------
 
-Until version 1.0 of the tool, the TOML version is set to 0 and may change incompatibly change between 0.x releases.
+Until version 1.0 of the tool, the TOML version is set to 0 and may change incompatibly between 0.x releases.
 You can find migration information in the `CHANGELOG.md` file.
 
 ```toml
@@ -139,7 +139,7 @@ asm = "https://gitlab.ow2.org/asm/asm.git"
 Development
 -----------
 
-If you have Rust installed, a debug binary can be build with `cargo build` and a release binary with `cargo build --release`.
+If you have Rust installed, a debug binary can be built with `cargo build` and a release binary with `cargo build --release`.
 The binary will be in `target/debug/gitout` or `target/release/gitout`, respectively.
 Run all the tests with `cargo test`.
 Format the code with `cargo fmt`.
