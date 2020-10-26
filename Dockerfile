@@ -29,6 +29,7 @@ ENV \
     RUST_BACKTRACE=full \
     CRON="" \
     HEALTHCHECK_ID="" \
+    HEALTHCHECK_HOST="https://hc-ping.com" \
     PUID="" \
     PGID="" \
     GITOUT_ARGS=""

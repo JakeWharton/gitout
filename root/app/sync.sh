@@ -1,7 +1,7 @@
 #!/usr/bin/with-contenv sh
 
 if [ -n "$HEALTHCHECK_ID" ]; then
-	curl -sS -X POST -o /dev/null "https://hc-ping.com/$HEALTHCHECK_ID/start"
+	curl -sS -X POST -o /dev/null "$HEALTHCHECK_HOST/$HEALTHCHECK_ID/start"
 fi
 
 # If gitout fails we want to avoid triggering the health check.
@@ -11,5 +11,5 @@ set -e
 /app/gitout --no-archive $GITOUT_ARGS /config/config.toml /data
 
 if [ -n "$HEALTHCHECK_ID" ]; then
-	curl -sS -X POST -o /dev/null --fail "https://hc-ping.com/$HEALTHCHECK_ID"
+	curl -sS -X POST -o /dev/null --fail "$HEALTHCHECK_HOST/$HEALTHCHECK_ID"
 fi
