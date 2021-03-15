@@ -25,12 +25,15 @@ pub fn user_repos(client: &Client, user: &str, token: &str) -> Repositories {
 	let mut starred_repos: Vec<String> = vec![];
 	let mut watched_after: Option<String> = None;
 	let mut watched_repos: Vec<String> = vec![];
+	let mut gists_after: Option<String> = None;
+	let mut gists_repos: Vec<String> = vec![];
 	loop {
 		let query = UserRepos::build_query(user_repos::Variables {
 			login: user.to_string(),
 			owner_after: owned_after.clone(),
 			starred_after: starred_after.clone(),
 			watched_after: watched_after.clone(),
+			gists_after: gists_after.clone(),
 		});
 		let response = client
 			.post("https://api.github.com/graphql")
@@ -45,7 +48,12 @@ pub fn user_repos(client: &Client, user: &str, token: &str) -> Repositories {
 		let owned_response = user.repositories.edges.unwrap();
 		let starred_response = user.starred_repositories.edges.unwrap();
 		let watched_response = user.watching.edges.unwrap();
-		if owned_response.is_empty() && starred_response.is_empty() && watched_response.is_empty() {
+		let gists_response = user.gists.edges.unwrap();
+		if owned_response.is_empty()
+			&& starred_response.is_empty()
+			&& watched_response.is_empty()
+			&& gists_response.is_empty()
+		{
 			break;
 		}
 		for repository in owned_response {
@@ -66,12 +74,19 @@ pub fn user_repos(client: &Client, user: &str, token: &str) -> Repositories {
 			watched_after = Some(repository.cursor);
 			watched_repos.push(repository.node.unwrap().name_with_owner);
 		}
+		for gist in gists_response {
+			let gist = gist.unwrap();
+
+			gists_after = Some(gist.cursor);
+			gists_repos.push(gist.node.unwrap().name);
+		}
 	}
 
 	Repositories {
 		owned: owned_repos,
 		starred: starred_repos,
 		watched: watched_repos,
+		gists: gists_repos,
 	}
 }
 
@@ -80,6 +95,7 @@ pub struct Repositories {
 	pub owned: Vec<String>,
 	pub starred: Vec<String>,
 	pub watched: Vec<String>,
+	pub gists: Vec<String>,
 }
 
 pub fn archive_repo(client: &Client, dir: &PathBuf, repository: &str, token: &str) {

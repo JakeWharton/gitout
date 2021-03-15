@@ -2,7 +2,8 @@ query UserRepos(
   $login: String!,
   $owner_after: String,
   $starred_after: String,
-  $watched_after: String
+  $watched_after: String,
+  $gists_after: String,
 ) {
   user(login: $login) {
     repositories(first: 100, ownerAffiliations: OWNER, after: $owner_after) {
@@ -26,6 +27,14 @@ query UserRepos(
         cursor
         node {
           nameWithOwner
+        }
+      }
+    }
+    gists(first: 100, privacy: ALL, after: $gists_after) {
+      edges {
+        cursor
+        node {
+          name
         }
       }
     }
