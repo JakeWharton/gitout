@@ -36,14 +36,27 @@ impl Default for GitHubArchive {
 	}
 }
 
-#[derive(Debug, Default, Deserialize, PartialEq)]
+#[derive(Debug, Deserialize, PartialEq)]
 pub struct GitHubClone {
 	#[serde(default)]
 	pub starred: bool,
 	#[serde(default)]
 	pub watched: bool,
 	#[serde(default)]
+	pub gists: bool,
+	#[serde(default)]
 	pub repos: Vec<String>,
+}
+
+impl Default for GitHubClone {
+	fn default() -> Self {
+		GitHubClone {
+			starred: false,
+			watched: false,
+			gists: true,
+			repos: vec![],
+		}
+	}
 }
 
 #[derive(Debug, Deserialize, PartialEq)]
@@ -96,6 +109,7 @@ mod test {
 			[github.clone]
 			starred = true
 			watched = true
+			gists = false
 			repos = [
 				"example/two",
 			]
@@ -122,6 +136,7 @@ mod test {
 				clone: GitHubClone {
 					starred: true,
 					watched: true,
+					gists: false,
 					repos: vec!["example/two".to_string()],
 				},
 			}),

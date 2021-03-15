@@ -84,6 +84,24 @@ fn main() {
 			println!();
 		}
 
+		if github.clone.gists {
+			let mut gists_dir = github_dir.clone();
+			gists_dir.push("gists");
+
+			let gist_names = user_repos.gists;
+			println!("Checking {0} GitHub gists for updates…", gist_names.len());
+			for (i, name) in gist_names.iter().enumerate() {
+				print!("\r{0}/{1} ", i + 1, &gist_names.len());
+				io::stdout().flush().unwrap();
+
+				let url = format!("https://gist.github.com/{0}.git", &name);
+				let username = &github.user;
+				let password = &github.token;
+				clone_or_fetch_bare(&gists_dir, &name, &url, dry_run, Some((username, password)));
+			}
+			println!("\n");
+		}
+
 		let mut clone_dir = github_dir;
 		clone_dir.push("clone");
 
@@ -100,7 +118,7 @@ fn main() {
 		let clone_repos: HashSet<String> = clone_repos.into_iter().collect();
 
 		println!(
-			"Checking {0} GitHub repository clones for updates…",
+			"Checking {0} GitHub repositories for updates…",
 			clone_repos.len()
 		);
 		for (i, repo) in clone_repos.iter().enumerate() {
