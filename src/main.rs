@@ -19,7 +19,7 @@ fn main() {
 		config,
 		destination,
 		verbose,
-		no_archive,
+		experimental_archive,
 		dry_run,
 	} = args;
 
@@ -66,7 +66,7 @@ fn main() {
 		}
 		let archive_repos: HashSet<String> = archive_repos.into_iter().collect();
 
-		if !no_archive {
+		if experimental_archive {
 			println!("Archiving {0} GitHub repositories…", archive_repos.len());
 			for (i, repo) in archive_repos.iter().enumerate() {
 				print!(
