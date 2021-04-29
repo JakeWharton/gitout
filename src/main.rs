@@ -115,6 +115,9 @@ fn main() {
 		if github.clone.watched {
 			clone_repos.extend(user_repos.watched);
 		}
+		if !github.clone.ignored.is_empty() {
+			clone_repos.retain(|r| !github.clone.ignored.contains(r))
+		}
 		let clone_repos: HashSet<String> = clone_repos.into_iter().collect();
 
 		println!(
