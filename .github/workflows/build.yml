@@ -12,14 +12,14 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v2.3.4
     - run: docker build .
 
   cargo:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v2.3.4
     - run: docker build .
     - uses: actions-rs/toolchain@v1
       with:
