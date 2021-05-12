@@ -21,10 +21,10 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - run: docker build .
-    - uses: actions-rs/toolchain@v1
+    - uses: actions-rs/toolchain@v1.0.7
       with:
         toolchain: stable
-    - uses: actions-rs/cargo@v1
+    - uses: actions-rs/cargo@v1.0.3
       with:
         command: publish
         args: --dry-run
