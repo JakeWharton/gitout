@@ -14,7 +14,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2.3.4
 
-      - uses: crazy-max/ghaction-docker-meta@v1
+      - uses: crazy-max/ghaction-docker-meta@v3.3.0
         id: docker_meta
         with:
           images: |
