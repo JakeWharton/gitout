@@ -118,6 +118,10 @@ watched = true  # Optional, default false
 repos = [
   "JakeWharton/gitout",
 ]
+# Repos temporary or otherwise that you do not want to be synchronized.
+ignored = [
+  "JakeWharton/TestParameterInjector",
+]
 
 # Repos not on GitHub to synchronize.
 [git.repos]

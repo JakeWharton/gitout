@@ -46,6 +46,8 @@ pub struct GitHubClone {
 	pub gists: bool,
 	#[serde(default)]
 	pub repos: Vec<String>,
+	#[serde(default)]
+	pub ignored: Vec<String>,
 }
 
 impl Default for GitHubClone {
@@ -55,6 +57,7 @@ impl Default for GitHubClone {
 			watched: false,
 			gists: true,
 			repos: vec![],
+			ignored: vec![],
 		}
 	}
 }
@@ -138,6 +141,7 @@ mod test {
 					watched: true,
 					gists: false,
 					repos: vec!["example/two".to_string()],
+					ignored: vec![],
 				},
 			}),
 			git: Some(Git { repos }),
