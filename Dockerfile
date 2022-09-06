@@ -10,7 +10,7 @@ RUN cargo test
 RUN cargo fmt -- --check
 
 
-FROM golang:1.18-alpine AS shell
+FROM golang:1.19.1-alpine AS shell
 RUN apk add --no-cache shellcheck
 ENV GO111MODULE=on
 RUN go install mvdan.cc/sh/v3/cmd/shfmt@latest
