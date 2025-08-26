@@ -1,45 +1,33 @@
-# Cross-compile the app for musl to create a statically-linked binary for alpine.
-FROM rust:1.65.0 AS rust
-RUN rustup component add clippy rustfmt
+FROM alpine:3.22.1 AS build
+ENV GRADLE_OPTS="-Dkotlin.incremental=false -Dorg.gradle.daemon=false -Dorg.gradle.vfs.watch=false -Dorg.gradle.logging.stacktrace=full"
+
+RUN apk add --no-cache \
+      openjdk21 \
+ && rm -rf /var/cache/* \
+ && mkdir /var/cache/apk
+
 WORKDIR /app
-COPY Cargo.toml Cargo.lock .rustfmt.toml ./
-COPY src ./src
-RUN cargo build --release
-RUN cargo clippy
-RUN cargo test
-RUN cargo fmt -- --check
 
+# Get the Gradle wrapper and cache the Gradle distribution first.
+COPY gradlew settings.gradle ./
+COPY gradle/wrapper ./gradle/wrapper
+RUN ./gradlew --version
 
-FROM golang:1.18-alpine AS shell
-RUN apk add --no-cache shellcheck
-ENV GO111MODULE=on
-RUN go install mvdan.cc/sh/v3/cmd/shfmt@latest
-WORKDIR /overlay
-COPY root/ ./
-COPY .editorconfig /
-RUN find . -type f | xargs shellcheck -e SC1008
-RUN shfmt -d .
+COPY gradle/libs.versions.toml ./gradle/libs.versions.toml
+COPY build.gradle ./
+COPY src/main ./src/main
+RUN ./gradlew installDist
 
+FROM alpine:3.22.1
 
-FROM debian:buster-slim
-ADD https://github.com/just-containers/s6-overlay/releases/download/v2.2.0.1/s6-overlay-amd64-installer /tmp/
-RUN chmod +x /tmp/s6-overlay-amd64-installer && /tmp/s6-overlay-amd64-installer /
-ENV \
-    # Fail if cont-init scripts exit with non-zero code.
-    S6_BEHAVIOUR_IF_STAGE2_FAILS=2 \
-    # Show full backtraces for crashes.
-    RUST_BACKTRACE=full \
-    CRON="" \
-    HEALTHCHECK_ID="" \
-    HEALTHCHECK_HOST="https://hc-ping.com" \
-    PUID="" \
-    PGID="" \
-    GITOUT_ARGS=""
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends \
-        curl \
-      && \
-    rm -rf /var/lib/apt/lists/*
-COPY root/ /
+RUN apk add --no-cache \
+      openjdk8-jre-base \
+      tini \
+ && rm -rf /var/cache/* \
+ && mkdir /var/cache/apk
+
 WORKDIR /app
-COPY --from=rust /app/target/release/gitout ./
+COPY --from=build /app/build/install/gitout ./
+
+ENTRYPOINT ["/sbin/tini", "--", "/app/bin/gitout"]
+CMD ["--help"]

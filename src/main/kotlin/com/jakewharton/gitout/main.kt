@@ -1,0 +1,118 @@
+@file:JvmName("Main")
+
+package com.jakewharton.gitout
+
+import com.github.ajalt.clikt.command.CoreSuspendingCliktCommand
+import com.github.ajalt.clikt.command.main
+import com.github.ajalt.clikt.parameters.arguments.argument
+import com.github.ajalt.clikt.parameters.arguments.help
+import com.github.ajalt.clikt.parameters.options.convert
+import com.github.ajalt.clikt.parameters.options.counted
+import com.github.ajalt.clikt.parameters.options.default
+import com.github.ajalt.clikt.parameters.options.flag
+import com.github.ajalt.clikt.parameters.options.help
+import com.github.ajalt.clikt.parameters.options.option
+import com.github.ajalt.clikt.parameters.types.path
+import io.github.kevincianfarini.cardiologist.PulseBackpressureStrategy.Companion.SkipNext
+import io.github.kevincianfarini.cardiologist.schedulePulse
+import java.nio.file.FileSystem
+import java.nio.file.FileSystems
+import kotlin.time.Clock
+import kotlinx.datetime.TimeZone
+import okhttp3.HttpUrl.Companion.toHttpUrl
+import okhttp3.OkHttpClient
+import okhttp3.logging.HttpLoggingInterceptor
+import okhttp3.logging.HttpLoggingInterceptor.Level.BODY
+
+public suspend fun main(vararg args: String) {
+	val systemFs = FileSystems.getDefault()!!
+	val systemClock = Clock.System
+	val systemTimeZone = TimeZone.currentSystemDefault()
+	GitOutCommand(systemFs, systemClock, systemTimeZone).main(args)
+}
+
+private class GitOutCommand(
+	fs: FileSystem,
+	private val clock: Clock,
+	private val timeZone: TimeZone,
+) : CoreSuspendingCliktCommand("gitout") {
+	private val config by argument()
+		.path(mustExist = true, canBeDir = false, fileSystem = fs)
+		.help("Configuration TOML")
+
+	private val destination by argument()
+		.path(fileSystem = fs)
+		.help("Backup directory")
+
+	private val verbosity by option("--verbose", "-v")
+		.counted(limit = 3)
+		.help(
+			"""
+			|Increase logging verbosity
+			|
+			|-v = informational, -vv = debug, -vvv = trace
+			""".trimMargin(),
+		)
+
+	private val quiet by option("--quiet", "-q")
+		.flag()
+		.help("Decrease logging verbosity. Takes precedence over --verbose / -v")
+
+	// TODO private val archive by option("--experimental-archive")
+	//      	.flag()
+	//      	.help("Enable EXPERIMENTAL repository archive")
+
+	private val dryRun by option()
+		.flag()
+		.help("Print actions instead of performing them")
+
+	private val cron by option()
+		.help("Run command forever and perform sync on this schedule")
+
+	private val healthCheckId by option()
+		.help("ID of Healthchecks.io service to notify")
+
+	private val healthCheckHost by option()
+		.convert { it.toHttpUrl() }
+		.default("https://hc-ping.com".toHttpUrl())
+		.help("Host of Healthchecks.io service to notify. Requires --health-check-id")
+
+	override suspend fun run() {
+		val logger = Logger(quiet, verbosity)
+
+		val client = OkHttpClient.Builder()
+			.addNetworkInterceptor(
+				HttpLoggingInterceptor {
+					logger.trace { it }
+				}.also {
+					it.level = BODY
+				}
+			)
+			.build()
+
+		val healthCheckService = HealthCheckService(healthCheckHost, client, logger)
+		val healthCheck = healthCheckId?.let(healthCheckService::newCheck)
+
+		val engine = Engine(
+			config = config,
+			destination = destination,
+			logger = logger,
+			client = client,
+			healthCheck = healthCheck,
+		)
+
+		val cron = cron
+		if (cron != null) {
+			logger.lifecycle { "Cron schedule: $cron" }
+			val pulse = clock.schedulePulse(cron, timeZone)
+			pulse.beat(strategy = SkipNext) {
+				engine.performSync(dryRun)
+			}
+		} else {
+			engine.performSync(dryRun)
+		}
+
+		client.connectionPool.evictAll()
+		client.dispatcher.executorService.shutdown()
+	}
+}

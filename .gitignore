@@ -1,6 +1,4 @@
-# Cargo
-/target
-
-# IntelliJ IDEA
+/.gradle
 /.idea
-*.iml
+/.kotlin
+/build

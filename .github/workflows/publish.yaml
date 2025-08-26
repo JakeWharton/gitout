@@ -1,0 +1,68 @@
+name: publish
+
+on:
+  push:
+    branches:
+      - trunk
+    tags:
+      - '*'
+
+env:
+  GRADLE_OPTS: "-Dorg.gradle.daemon=false -Dorg.gradle.vfs.watch=false -Dkotlin.incremental=false -Dorg.gradle.logging.stacktrace=full"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version-file: .github/workflows/.java-version
+      - uses: gradle/actions/setup-gradle@v4
+
+      - run: ./gradlew distZip
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: gitout.zip
+          path: build/distributions/gitout.zip
+
+      - uses: crazy-max/ghaction-docker-meta@v1
+        id: docker_meta
+        with:
+          images: |
+            jakewharton/gitout
+            ghcr.io/jakewharton/gitout
+          tag-semver: |
+            {{version}}
+            {{major}}
+            {{major}}.{{minor}}
+
+      - uses: docker/login-action@v3
+        with:
+          username: jakewharton
+          password: ${{ secrets.DOCKER_HUB_TOKEN }}
+
+      - run: echo ${{ secrets.GHCR_TOKEN }} | docker login ghcr.io -u $GITHUB_ACTOR --password-stdin
+
+      - uses: docker/build-push-action@v6
+        with:
+          push: true
+          tags: ${{ steps.docker_meta.outputs.tags }}
+          labels: ${{ steps.docker_meta.outputs.labels }}
+
+      - name: Extract release notes
+        id: release_notes
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: ffurrer2/extract-release-notes@v2
+
+      - name: Create Release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          body: ${{ steps.release_notes.outputs.release_notes }}
+          files: build/distributions/gitout.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

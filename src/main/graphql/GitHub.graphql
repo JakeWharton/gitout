@@ -1,0 +1,42 @@
+query UserRepos(
+  $login: String!,
+  $ownerAfter: String,
+  $starredAfter: String,
+  $watchingAfter: String,
+  $gistsAfter: String,
+) {
+  user(login: $login) {
+    ownedRepositories: repositories(first: 100, ownerAffiliations: OWNER, after: $ownerAfter) {
+      ownedEdges: edges {
+        cursor
+        node {
+          nameWithOwner
+        }
+      }
+    }
+    starredRepositories(first: 100, after: $starredAfter) {
+      starredEdges: edges {
+        cursor
+        node {
+          nameWithOwner
+        }
+      }
+    }
+    watchingRepositories: watching(first: 100, after: $watchingAfter) {
+      watchingEdges: edges {
+        cursor
+        node {
+          nameWithOwner
+        }
+      }
+    }
+    gistRepositories: gists(first: 100, privacy: ALL, after: $gistsAfter) {
+      gistEdges: edges {
+        cursor
+        node {
+          name
+        }
+      }
+    }
+  }
+}

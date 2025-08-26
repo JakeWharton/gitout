@@ -1,0 +1,74 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
+
+buildscript {
+	dependencies {
+		classpath libs.kotlin.gradlePlugin
+		classpath libs.kotlin.serializationPlugin
+		classpath libs.poko.gradlePlugin
+		classpath libs.buildConfig.gradlePlugin
+		classpath libs.apollo.gradlePlugin
+	}
+	repositories {
+		mavenCentral()
+		gradlePluginPortal()
+	}
+}
+
+apply plugin: 'org.jetbrains.kotlin.jvm'
+apply plugin: 'org.jetbrains.kotlin.plugin.serialization'
+apply plugin: 'dev.drewhamilton.poko'
+apply plugin: 'com.github.gmazzo.buildconfig'
+apply plugin: 'com.apollographql.apollo'
+apply plugin: 'application'
+
+kotlin {
+	explicitApi()
+}
+
+dependencies {
+	implementation libs.clikt
+	implementation libs.cardiologist
+	implementation libs.okhttp.core
+	implementation libs.okhttp.loggingInterceptor
+	implementation libs.ktoml
+	implementation libs.kotlinx.serialization.core
+	implementation libs.apollo.runtime
+
+	testImplementation libs.junit
+	testImplementation libs.assertk
+}
+
+apollo {
+	service('github') {
+		packageName.set('com.jakewharton.gitout')
+	}
+}
+
+application {
+	mainClass = 'com.jakewharton.gitout.Main'
+}
+
+buildConfig {
+	useKotlinOutput {
+		internalVisibility = true
+		topLevelConstants = true
+	}
+
+	packageName('com.jakewharton.gitout')
+	buildConfigField("String", "version", "\"${project.version}\"")
+}
+
+tasks.withType(JavaCompile).configureEach { task ->
+	task.sourceCompatibility = '1.8'
+	task.targetCompatibility = '1.8'
+}
+
+tasks.withType(KotlinJvmCompile).configureEach { task ->
+	task.compilerOptions {
+		jvmTarget = JvmTarget.JVM_1_8
+		freeCompilerArgs.add('-Xjdk-release=8')
+		freeCompilerArgs.add('-Xjvm-default=all')
+		freeCompilerArgs.add('-opt-in=kotlin.time.ExperimentalTime')
+	}
+}

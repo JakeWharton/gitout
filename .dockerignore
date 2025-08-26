@@ -1,6 +1,10 @@
-# Cargo
-/target
-
-# IntelliJ IDEA
+/.editorconfig
+/.git
+/.gitignore
+/.github
+/.gradle
 /.idea
-*.iml
+/.kotlin
+/build
+/LICENSE.txt
+/*.md
