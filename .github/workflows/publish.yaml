@@ -5,7 +5,7 @@ on:
     branches:
       - trunk
     tags:
-      - '*'
+      - '**'
 
 env:
   GRADLE_OPTS: "-Dorg.gradle.daemon=false -Dorg.gradle.vfs.watch=false -Dkotlin.incremental=false -Dorg.gradle.logging.stacktrace=full"

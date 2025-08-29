@@ -3,11 +3,6 @@ name: build
 on:
   pull_request: {}
   workflow_dispatch: {}
-  push:
-    branches:
-      - 'trunk'
-    tags-ignore:
-      - '**'
 
 env:
   GRADLE_OPTS: "-Dorg.gradle.daemon=false -Dorg.gradle.vfs.watch=false -Dkotlin.incremental=false -Dorg.gradle.logging.stacktrace=full"
