@@ -17,13 +17,14 @@ If you need access to the files, you can `git clone /path/to/bare/repo`.
 
 ### Docker
 
-The binary is available inside the `jakewharton/gitout` Docker container,
+The binary is available inside the `jakewharton/gitout` Docker container.
 
-[![Docker Image Version](https://img.shields.io/docker/v/jakewharton/gitout?sort=semver)][hub]
-[![Docker Image Size](https://img.shields.io/docker/image-size/jakewharton/gitout)][layers]
+[![Docker Image Version](https://img.shields.io/docker/v/jakewharton/gitout?sort=semver&style=flat-square)][hub]
+[![Docker Image Size](https://img.shields.io/docker/image-size/jakewharton/gitout?sort=semver&style=flat-square)][hub]<br>
+[![Docker Image Version](https://img.shields.io/docker/v/jakewharton/gitout/trunk?style=flat-square)][hub]
+[![Docker Image Size](https://img.shields.io/docker/image-size/jakewharton/gitout/trunk?style=flat-square)][hub]
 
  [hub]: https://hub.docker.com/r/jakewharton/gitout/
- [layers]: https://microbadger.com/images/jakewharton/gitout
 
 Mount a `/data` volume which is where the repositories will be stored.
 Mount the `/config` folder which contains a `config.toml` or mount a `/config/config.toml` file directly.
@@ -62,6 +63,7 @@ services:
 
 Note: You may want to specify an explicit version rather than `latest`.
 See https://hub.docker.com/r/jakewharton/gitout/tags or `CHANGELOG.md` for the available versions.
+Use `trunk` for the latest changes.
 
 ### Binaries
 
