@@ -1,5 +1,4 @@
-Git Out
-=======
+# Git Out
 
 A command-line tool to automatically backup Git repositories from GitHub or anywhere.
 
@@ -14,18 +13,11 @@ In other words, there is no working copy of the files for you to interact with.
 If you need access to the files, you can `git clone /path/to/bare/repo`.
 
 
-Installation
-------------
-
-### Rust
-
-If you have Rust installed you can install the binary by running `cargo install gitout`.
-
-[![Latest version](https://img.shields.io/crates/v/gitout.svg)](https://crates.io/crates/gitout)
+## Installation
 
 ### Docker
 
-The binary is available inside the `jakewharton/gitout` Docker container which can run it as a cron job.
+The binary is available inside the `jakewharton/gitout` Docker container,
 
 [![Docker Image Version](https://img.shields.io/docker/v/jakewharton/gitout?sort=semver)][hub]
 [![Docker Image Size](https://img.shields.io/docker/image-size/jakewharton/gitout)][layers]
@@ -35,13 +27,15 @@ The binary is available inside the `jakewharton/gitout` Docker container which c
 
 Mount a `/data` volume which is where the repositories will be stored.
 Mount the `/config` folder which contains a `config.toml` or mount a `/config/config.toml` file directly.
-Specify a `CRON` environment variable with a cron specifier dictating the schedule for when the tool should run.
+
+By default, the tool will run a single sync and then exit.
+If you specify the `GITOUT_CRON` environment variable with a valid cron specifier, the tool will not exit and perform automatic syncs in accordance with the schedule.
 
 ```
 $ docker run -d \
     -v /path/to/data:/data \
     -v /path/to/config.toml:/config/config.toml \
-    -e "CRON=0 * * * *" \
+    -e "GITOUT_CRON=0 * * * *" \
     jakewharton/gitout
 ```
 
@@ -61,11 +55,9 @@ services:
       - /path/to/data:/data
       - /path/to/config:/config
     environment:
-      - "CRON=0 * * * *"
+      - "GITOUT_CRON=0 * * * *"
       #Optional:
-      - "HEALTHCHECK_ID=..."
-      - "PUID=..."
-      - "PGID=..."
+      - "GITOUT_HC_ID=..."
 ```
 
 Note: You may want to specify an explicit version rather than `latest`.
@@ -73,33 +65,35 @@ See https://hub.docker.com/r/jakewharton/gitout/tags or `CHANGELOG.md` for the a
 
 ### Binaries
 
-TODO GitHub releases download binaries https://github.com/JakeWharton/gitout/issues/8
+A `.zip` can be downloaded from the [latest GitHub release](https://github.com/JakeWharton/gitout/releases/latest).
+
+The Java Virtual Machine must be installed on your system to run.
+After unzipping, run either `bin/gitout` (macOS, Linux) or `bin/gitout.bat` (Windows).
 
 
-Usage
------
+## Usage
 
 ```
 $ gitout --help
-gitout 0.1.0
+Usage: gitout [<options>] <config> <destination>
 
-USAGE:
-    gitout [FLAGS] <config> <destination>
+Options:
+  --version            Show the version and exit
+  -v, --verbose        Increase logging verbosity. -v = informational, -vv = debug, -vvv = trace
+  -q, --quiet          Decrease logging verbosity. Takes precedence over verbosity
+  --dry-run            Print actions instead of performing them
+  --cron=<expression>  Run command forever and perform sync on this schedule
+  --hc-id=<id>         ID of Healthchecks.io service to notify
+  --hc-host=<url>      Host of Healthchecks.io service to notify. Requires --health-check-id
+  -h, --help           Show this message and exit
 
-FLAGS:
-        --dry-run    Print actions instead of performing them
-    -h, --help       Prints help information
-    -V, --version    Prints version information
-    -v, --verbose    Enable verbose logging
-
-ARGS:
-    <config>         Configuration file
-    <destination>    Backup directory
+Arguments:
+  <config>       Configuration TOML
+  <destination>  Backup directory
 ```
 
 
-Configuration specification
----------------------------
+## Configuration
 
 Until version 1.0 of the tool, the TOML version is set to 0 and may change incompatibly between 0.x releases.
 You can find migration information in the `CHANGELOG.md` file.
@@ -141,20 +135,7 @@ asm = "https://gitlab.ow2.org/asm/asm.git"
   6. Copy the value into your `config.toml` as it will not be shown again
 
 
-Development
------------
-
-If you have Rust installed, a debug binary can be built with `cargo build` and a release binary with `cargo build --release`.
-The binary will be in `target/debug/gitout` or `target/release/gitout`, respectively.
-Run all the tests with `cargo test`.
-Format the code with `cargo fmt`.
-Run the Clippy tool with `cargo clippy`.
-
-If you have Docker but not Rust, run `docker build .` which will do everything. This is what runs on CI.
-
-
-LICENSE
-======
+# LICENSE
 
 MIT. See `LICENSE.txt`.
 

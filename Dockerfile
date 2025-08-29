@@ -20,6 +20,9 @@ RUN ./gradlew installDist
 
 FROM alpine:3.22.1
 
+VOLUME /config
+VOLUME /data
+
 RUN apk add --no-cache \
       openjdk8-jre-base \
       tini \
