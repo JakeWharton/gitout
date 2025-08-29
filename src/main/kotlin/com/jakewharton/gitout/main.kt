@@ -14,6 +14,7 @@ import com.github.ajalt.clikt.parameters.options.help
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.types.path
 import io.github.kevincianfarini.cardiologist.PulseBackpressureStrategy.Companion.SkipNext
+import io.github.kevincianfarini.cardiologist.PulseSchedule
 import io.github.kevincianfarini.cardiologist.schedulePulse
 import java.nio.file.FileSystem
 import java.nio.file.FileSystems
@@ -66,8 +67,9 @@ private class GitOutCommand(
 		.flag()
 		.help("Print actions instead of performing them")
 
-	private val cron by option()
+	private val schedule by option("--cron")
 		.help("Run command forever and perform sync on this schedule")
+		.convert { PulseSchedule.parseCron(it) }
 
 	private val healthCheckId by option()
 		.help("ID of Healthchecks.io service to notify")
@@ -101,11 +103,12 @@ private class GitOutCommand(
 			healthCheck = healthCheck,
 		)
 
-		val cron = cron
-		if (cron != null) {
-			logger.lifecycle { "Cron schedule: $cron" }
-			val pulse = clock.schedulePulse(cron, timeZone)
+		val schedule = schedule
+		if (schedule != null) {
+			logger.lifecycle { "Sync schedule: $schedule" }
+			val pulse = clock.schedulePulse(schedule, timeZone)
 			pulse.beat(strategy = SkipNext) {
+				logger.lifecycle { "Schedule trigger for $it, executing at ${clock.now()}" }
 				engine.performSync(dryRun)
 			}
 		} else {
