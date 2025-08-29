@@ -84,7 +84,7 @@ Options:
   --dry-run            Print actions instead of performing them
   --cron=<expression>  Run command forever and perform sync on this schedule
   --hc-id=<id>         ID of Healthchecks.io service to notify
-  --hc-host=<url>      Host of Healthchecks.io service to notify. Requires --health-check-id
+  --hc-host=<url>      Host of Healthchecks.io service to notify. Requires --hc-id
   -h, --help           Show this message and exit
 
 Arguments:

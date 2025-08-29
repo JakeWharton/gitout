@@ -76,7 +76,7 @@ private class GitOutCommand(
 	private val healthCheckHost by option("--hc-host", metavar = "url", envvar = "GITOUT_HC_HOST")
 		.convert { it.toHttpUrl() }
 		.default("https://hc-ping.com".toHttpUrl())
-		.help("Host of Healthchecks.io service to notify. Requires --health-check-id")
+		.help("Host of Healthchecks.io service to notify. Requires --hc-id")
 
 	override suspend fun run() {
 		val logger = Logger(quiet, verbosity)
