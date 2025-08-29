@@ -23,7 +23,8 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: gitout.zip
-          path: build/distributions/gitout.zip
+          path: build/distributions/gitout-*.zip
+          if-no-files-found: error
 
   docker:
     runs-on: ubuntu-latest
