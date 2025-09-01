@@ -24,6 +24,7 @@ VOLUME /config
 VOLUME /data
 
 RUN apk add --no-cache \
+      git \
       openjdk8-jre-base \
       tini \
  && rm -rf /var/cache/* \
@@ -33,4 +34,4 @@ WORKDIR /app
 COPY --from=build /app/build/install/gitout ./
 
 ENTRYPOINT ["/sbin/tini", "--", "/app/bin/gitout"]
-CMD ["--help"]
+CMD ["/config/config.toml", "/data"]

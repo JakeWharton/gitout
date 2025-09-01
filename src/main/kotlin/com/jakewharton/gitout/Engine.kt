@@ -1,13 +1,16 @@
 package com.jakewharton.gitout
 
-import dev.drewhamilton.poko.Poko
+import java.lang.ProcessBuilder.Redirect.INHERIT
+import java.nio.file.Files
 import java.nio.file.Path
 import java.util.concurrent.TimeUnit.MINUTES
+import kotlin.io.path.absolutePathString
 import kotlin.io.path.exists
 import kotlin.io.path.isDirectory
 import kotlin.io.path.name
 import kotlin.io.path.notExists
 import kotlin.io.path.readText
+import kotlin.io.path.writeText
 import okhttp3.HttpUrl
 import okhttp3.OkHttpClient
 
@@ -87,10 +90,22 @@ internal class Engine(
 				}
 			}
 
-			val credentials = Credentials(
-				username = config.github.user,
-				password = if (dryRun) "dryrun!" else config.github.token,
-			)
+			val credentials = if (dryRun) {
+				null
+			} else {
+				Files.createTempFile("gitout-credentials-", "").apply {
+					toFile().deleteOnExit()
+					writeText(
+						HttpUrl.Builder()
+							.scheme("https")
+							.username(config.github.user)
+							.password(config.github.token)
+							.host("github.com")
+							.build()
+							.toString(),
+					)
+				}
+			}
 
 			val cloneDestination = githubDestination.resolve("clone")
 			for ((nameAndOwner, reasons) in nameAndOwnerToReasons) {
@@ -134,11 +149,11 @@ internal class Engine(
 		startedHealthCheck?.complete()
 	}
 
-	private fun syncBare(repo: Path, url: String, dryRun: Boolean, credentials: Credentials? = null) {
+	private fun syncBare(repo: Path, url: String, dryRun: Boolean, credentials: Path? = null) {
 		val command = mutableListOf("git")
 		if (credentials != null) {
 			command.add("-c")
-			command.add("""credential.helper='!f() { echo "username=${credentials.username}"; echo "password=${credentials.password}"; }; f'""")
+			command.add("""credential.helper=store --file=${credentials.absolutePathString()}""")
 		}
 
 		val directory = if (repo.notExists()) {
@@ -164,15 +179,10 @@ internal class Engine(
 			val process = ProcessBuilder()
 				.command(command)
 				.directory(directory.toFile())
+				.redirectError(INHERIT)
 				.start()
 			check(process.waitFor(5, MINUTES)) { "Unable to sync $url into $repo: 5m timeout" }
 			check(process.exitValue() == 0) { "Unable to sync $url into $repo: exit ${process.exitValue()}" }
 		}
 	}
-
-	@Poko
-	private class Credentials(
-		val username: String,
-		val password: String,
-	)
 }

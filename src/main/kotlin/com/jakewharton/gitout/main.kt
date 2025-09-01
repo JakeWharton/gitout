@@ -62,7 +62,7 @@ private class GitOutCommand(
 	//      	.flag()
 	//      	.help("Enable EXPERIMENTAL repository archive")
 
-	private val dryRun by option()
+	private val dryRun by option(envvar = "GITOUT_DRY_RUN")
 		.flag()
 		.help("Print actions instead of performing them")
 
