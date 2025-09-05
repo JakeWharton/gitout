@@ -2,7 +2,7 @@
 
 package com.jakewharton.gitout
 
-import com.github.ajalt.clikt.command.CoreSuspendingCliktCommand
+import com.github.ajalt.clikt.command.SuspendingCliktCommand
 import com.github.ajalt.clikt.command.main
 import com.github.ajalt.clikt.parameters.arguments.argument
 import com.github.ajalt.clikt.parameters.arguments.help
@@ -37,7 +37,7 @@ private class GitOutCommand(
 	fs: FileSystem,
 	private val clock: Clock,
 	private val timeZone: TimeZone,
-) : CoreSuspendingCliktCommand(name = "gitout") {
+) : SuspendingCliktCommand(name = "gitout") {
 	init {
 		versionOption(version)
 	}
