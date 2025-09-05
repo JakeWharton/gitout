@@ -3,6 +3,7 @@ package com.jakewharton.gitout
 import okhttp3.HttpUrl
 import okhttp3.OkHttpClient
 import okhttp3.Request
+import okhttp3.RequestBody
 
 internal class HealthCheckService(
 	private val host: HttpUrl,
@@ -29,7 +30,7 @@ internal class HealthCheck(
 			.build()
 
 		logger.debug { "Healthcheck start $startUrl" }
-		client.newCall(Request(url = startUrl, method = "POST")).execute()
+		client.newCall(Request(url = startUrl, method = "POST", body = RequestBody.EMPTY)).execute()
 
 		return Started(url, client, logger)
 	}
@@ -41,7 +42,7 @@ internal class HealthCheck(
 	) {
 		fun complete() {
 			logger.debug { "Healthcheck complete $url" }
-			client.newCall(Request(url = url, method = "POST")).execute()
+			client.newCall(Request(url = url, method = "POST", body = RequestBody.EMPTY)).execute()
 		}
 	}
 }
