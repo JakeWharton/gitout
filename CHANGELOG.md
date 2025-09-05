@@ -6,6 +6,7 @@
 New:
 - Rewrite the app in Kotlin (from Rust). Sorry (not sorry).
 - The binary distribution (which now requires a JVM) supports scheduled sync with the `--cron` option.
+- Add `--timeout` option / `GITOUT_TIMEOUT` env var to control limit on git operations. Default is 10 minutes.
 
 Changed:
 - The `CRON`, `HEALTHCHECK_ID`, and `HEALTHCHECK_HOST` Docker container environment variables are now named `GITOUT_CRON`, `GITOUT_HC_ID`, and `GITOUT_HC_HOST`, respectively. These will also be honored by the standalone binary.

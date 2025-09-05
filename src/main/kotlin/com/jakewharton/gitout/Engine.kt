@@ -3,7 +3,6 @@ package com.jakewharton.gitout
 import java.lang.ProcessBuilder.Redirect.INHERIT
 import java.nio.file.Files
 import java.nio.file.Path
-import java.util.concurrent.TimeUnit.MINUTES
 import kotlin.io.path.absolutePathString
 import kotlin.io.path.exists
 import kotlin.io.path.isDirectory
@@ -11,12 +10,14 @@ import kotlin.io.path.name
 import kotlin.io.path.notExists
 import kotlin.io.path.readText
 import kotlin.io.path.writeText
+import kotlin.time.Duration
 import okhttp3.HttpUrl
 import okhttp3.OkHttpClient
 
 internal class Engine(
 	private val config: Path,
 	private val destination: Path,
+	private val timeout: Duration,
 	private val logger: Logger,
 	private val client: OkHttpClient,
 	private val healthCheck: HealthCheck?,
@@ -181,7 +182,7 @@ internal class Engine(
 				.directory(directory.toFile())
 				.redirectError(INHERIT)
 				.start()
-			check(process.waitFor(5, MINUTES)) { "Unable to sync $url into $repo: 5m timeout" }
+			check(process.waitFor(timeout)) { "Unable to sync $url into $repo: timeout $timeout" }
 			check(process.exitValue() == 0) { "Unable to sync $url into $repo: exit ${process.exitValue()}" }
 		}
 	}

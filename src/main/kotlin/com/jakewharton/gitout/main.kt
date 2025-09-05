@@ -20,6 +20,8 @@ import io.github.kevincianfarini.cardiologist.schedulePulse
 import java.nio.file.FileSystem
 import java.nio.file.FileSystems
 import kotlin.time.Clock
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.minutes
 import kotlinx.datetime.TimeZone
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.OkHttpClient
@@ -49,6 +51,11 @@ private class GitOutCommand(
 	private val destination by argument()
 		.path(mustExist = true, canBeFile = false, fileSystem = fs)
 		.help("Backup directory")
+
+	private val timeout by option(envvar = "GITOUT_TIMEOUT")
+		.convert { Duration.parse(it) }
+		.default(10.minutes)
+		.help("Timeout for git clone/update operations (default: 10m)")
 
 	private val verbosity by option("--verbose", "-v")
 		.counted(limit = 3)
@@ -97,6 +104,7 @@ private class GitOutCommand(
 		val engine = Engine(
 			config = config,
 			destination = destination,
+			timeout = timeout,
 			logger = logger,
 			client = client,
 			healthCheck = healthCheck,
