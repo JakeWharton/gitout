@@ -4,6 +4,7 @@ import java.lang.ProcessBuilder.Redirect.INHERIT
 import java.nio.file.Files
 import java.nio.file.Path
 import kotlin.io.path.absolutePathString
+import kotlin.io.path.createDirectories
 import kotlin.io.path.exists
 import kotlin.io.path.isDirectory
 import kotlin.io.path.name
@@ -164,7 +165,9 @@ internal class Engine(
 				add(url)
 				add(repo.name)
 			}
-			repo.parent
+			repo.parent.apply {
+				createDirectories()
+			}
 		} else {
 			command.apply {
 				add("remote")
