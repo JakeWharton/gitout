@@ -19,7 +19,7 @@ okhttp-loggingInterceptor = { module = "com.squareup.okhttp3:logging-interceptor
 clikt = "com.github.ajalt.clikt:clikt:5.0.3"
 ktoml = "com.akuleshov7:ktoml-core:0.7.1"
 cardiologist = "io.github.kevincianfarini.cardiologist:cardiologist:0.8.0"
-poko-gradlePlugin = "dev.drewhamilton.poko:poko-gradle-plugin:0.19.3"
+poko-gradlePlugin = "dev.drewhamilton.poko:poko-gradle-plugin:0.20.2"
 buildConfig-gradlePlugin = "com.github.gmazzo:gradle-buildconfig-plugin:3.1.0"
 
 junit = "junit:junit:4.13.2"
