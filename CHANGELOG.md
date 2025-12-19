@@ -3,7 +3,8 @@
 ## [Unreleased]
 [Unreleased]: https://github.com/JakeWharton/gitout/compare/0.3.0...HEAD
 
-Nothing yet.
+New:
+- Linux Arm variant of Docker container.
 
 
 ## [0.3.0] - 2025-09-08
