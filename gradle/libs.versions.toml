@@ -16,7 +16,7 @@ kotlinx-serialization-core = { module = "org.jetbrains.kotlinx:kotlinx-serializa
 okhttp-core = { module = "com.squareup.okhttp3:okhttp", version.ref = "okhttp" }
 okhttp-loggingInterceptor = { module = "com.squareup.okhttp3:logging-interceptor", version.ref = "okhttp" }
 
-clikt = "com.github.ajalt.clikt:clikt:5.0.3"
+clikt = "com.github.ajalt.clikt:clikt:5.1.0"
 ktoml = "com.akuleshov7:ktoml-core:0.7.1"
 cardiologist = "io.github.kevincianfarini.cardiologist:cardiologist:0.8.0"
 poko-gradlePlugin = "dev.drewhamilton.poko:poko-gradle-plugin:0.21.1"
