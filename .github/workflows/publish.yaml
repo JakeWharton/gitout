@@ -30,7 +30,7 @@ jobs:
           path: build/distributions/gitout-*.zip
           if-no-files-found: error
 
-      - uses: crazy-max/ghaction-docker-meta@v5
+      - uses: crazy-max/ghaction-docker-meta@v6
         id: docker_meta
         with:
           images: |
