@@ -162,6 +162,7 @@ internal class Engine(
 			command.apply {
 				add("clone")
 				add("--mirror")
+				add("--")
 				add(url)
 				add(repo.name)
 			}
