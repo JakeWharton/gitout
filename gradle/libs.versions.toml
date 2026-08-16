@@ -2,7 +2,7 @@
 apollo = "5.0.1"
 kotlin = "2.4.10"
 kotlinx-serialization = "1.11.0"
-okhttp = "5.4.0"
+okhttp = "5.5.0"
 
 [libraries]
 apollo-gradlePlugin = { module = "com.apollographql.apollo:apollo-gradle-plugin", version.ref = "apollo" }
