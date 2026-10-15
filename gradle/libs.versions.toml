@@ -1,6 +1,6 @@
 [versions]
 apollo = "5.2.0"
-kotlin = "2.4.20"
+kotlin = "2.4.21"
 kotlinx-serialization = "1.11.0"
 okhttp = "5.5.0"
 
